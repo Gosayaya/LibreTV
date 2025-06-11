@@ -10,6 +10,8 @@ class RecommendationManager {
         // 选项卡切换事件
         const doubanTab = document.getElementById('rec-douban-tab');
         const imdbTab = document.getElementById('rec-imdb-tab');
+        const tmdbTab = document.getElementById('rec-tmdb-tab');
+        const tvmazeTab = document.getElementById('rec-tvmaze-tab');
 
         if (doubanTab) {
             doubanTab.addEventListener('click', () => {
@@ -20,6 +22,18 @@ class RecommendationManager {
         if (imdbTab) {
             imdbTab.addEventListener('click', () => {
                 this.switchTab('imdb');
+            });
+        }
+
+        if (tmdbTab) {
+            tmdbTab.addEventListener('click', () => {
+                this.switchTab('tmdb');
+            });
+        }
+
+        if (tvmazeTab) {
+            tvmazeTab.addEventListener('click', () => {
+                this.switchTab('tvmaze');
             });
         }
     }
@@ -41,69 +55,96 @@ class RecommendationManager {
     }
 
     updateTabStyles() {
-        const doubanTab = document.getElementById('rec-douban-tab');
-        const imdbTab = document.getElementById('rec-imdb-tab');
+        const tabs = {
+            douban: { element: document.getElementById('rec-douban-tab'), activeClass: 'bg-pink-600' },
+            imdb: { element: document.getElementById('rec-imdb-tab'), activeClass: 'bg-yellow-600' },
+            tmdb: { element: document.getElementById('rec-tmdb-tab'), activeClass: 'bg-blue-600' },
+            tvmaze: { element: document.getElementById('rec-tvmaze-tab'), activeClass: 'bg-orange-600' }
+        };
 
-        if (this.currentTab === 'douban') {
-            doubanTab.classList.add('bg-pink-600', 'text-white');
-            doubanTab.classList.remove('text-gray-400');
-            imdbTab.classList.remove('bg-yellow-600', 'text-white');
-            imdbTab.classList.add('text-gray-400');
-        } else {
-            imdbTab.classList.add('bg-yellow-600', 'text-white');
-            imdbTab.classList.remove('text-gray-400');
-            doubanTab.classList.remove('bg-pink-600', 'text-white');
-            doubanTab.classList.add('text-gray-400');
+        // 重置所有选项卡样式
+        Object.values(tabs).forEach(tab => {
+            if (tab.element) {
+                tab.element.classList.remove('bg-pink-600', 'bg-yellow-600', 'bg-blue-600', 'bg-orange-600', 'text-white');
+                tab.element.classList.add('text-gray-400');
+            }
+        });
+
+        // 激活当前选项卡
+        const currentTab = tabs[this.currentTab];
+        if (currentTab && currentTab.element) {
+            currentTab.element.classList.add(currentTab.activeClass, 'text-white');
+            currentTab.element.classList.remove('text-gray-400');
         }
     }
 
     updateContentVisibility() {
-        const doubanContent = document.getElementById('douban-content');
-        const imdbContent = document.getElementById('imdb-content');
+        const contents = {
+            douban: document.getElementById('douban-content'),
+            imdb: document.getElementById('imdb-content'),
+            tmdb: document.getElementById('tmdb-content'),
+            tvmaze: document.getElementById('tvmaze-content')
+        };
 
-        if (this.currentTab === 'douban') {
-            doubanContent.classList.remove('hidden');
-            imdbContent.classList.add('hidden');
-        } else {
-            imdbContent.classList.remove('hidden');
-            doubanContent.classList.add('hidden');
+        // 隐藏所有内容面板
+        Object.values(contents).forEach(content => {
+            if (content) content.classList.add('hidden');
+        });
+
+        // 显示当前选中的内容面板
+        const currentContent = contents[this.currentTab];
+        if (currentContent) {
+            currentContent.classList.remove('hidden');
         }
     }
 
     loadCurrentTabContent() {
-        if (this.currentTab === 'douban') {
-            // 触发豆瓣内容加载
-            if (typeof renderRecommend === 'function') {
-                renderRecommend(window.doubanCurrentTag || '热门', window.doubanPageSize || 24, window.doubanPageStart || 0);
-            }
-        } else if (this.currentTab === 'imdb') {
-            // 触发IMDB内容加载
-            if (window.imdbRecommendation && typeof window.imdbRecommendation.loadRecommendations === 'function') {
-                window.imdbRecommendation.loadRecommendations();
-            }
+        switch (this.currentTab) {
+            case 'douban':
+                // 触发豆瓣内容加载
+                if (typeof renderRecommend === 'function') {
+                    renderRecommend(window.doubanCurrentTag || '热门', window.doubanPageSize || 24, window.doubanPageStart || 0);
+                }
+                break;
+            case 'imdb':
+                // 触发IMDB内容加载
+                if (window.imdbRecommendation && typeof window.imdbRecommendation.loadRecommendations === 'function') {
+                    window.imdbRecommendation.loadRecommendations();
+                }
+                break;
+            case 'tmdb':
+                // 触发TMDB内容加载
+                if (window.tmdbRecommendation && typeof window.tmdbRecommendation.loadRecommendations === 'function') {
+                    window.tmdbRecommendation.loadRecommendations();
+                }
+                break;
+            case 'tvmaze':
+                // 触发TVMaze内容加载
+                if (window.tvmazeRecommendation && typeof window.tvmazeRecommendation.loadRecommendations === 'function') {
+                    window.tvmazeRecommendation.loadRecommendations();
+                }
+                break;
         }
     }
 
     // 初始化时加载默认内容
     initializeDefaultContent() {
-        const doubanEnabled = localStorage.getItem('doubanEnabled') === 'true';
-        const imdbEnabled = localStorage.getItem('imdbEnabled') === 'true';
+        const enabledSources = [
+            { name: 'douban', enabled: localStorage.getItem('doubanEnabled') === 'true' },
+            { name: 'imdb', enabled: localStorage.getItem('imdbEnabled') === 'true' },
+            { name: 'tmdb', enabled: localStorage.getItem('tmdbEnabled') === 'true' },
+            { name: 'tvmaze', enabled: localStorage.getItem('tvmazeEnabled') === 'true' }
+        ];
         
-        // 优先显示豆瓣推荐
-        if (doubanEnabled) {
-            this.switchTab('douban');
-            // 延迟加载豆瓣内容，确保DOM已准备就绪
+        // 查找第一个启用的数据源，优先级：豆瓣 > IMDB > TMDB > TVMaze
+        const firstEnabled = enabledSources.find(source => source.enabled);
+        
+        if (firstEnabled) {
+            this.switchTab(firstEnabled.name);
+            
+            // 延迟加载内容，确保DOM已准备就绪
             setTimeout(() => {
-                if (typeof renderRecommend === 'function') {
-                    renderRecommend('热门', 24, 0);
-                }
-            }, 200);
-        } else if (imdbEnabled) {
-            this.switchTab('imdb');
-            setTimeout(() => {
-                if (window.imdbRecommendation && typeof window.imdbRecommendation.loadRecommendations === 'function') {
-                    window.imdbRecommendation.loadRecommendations();
-                }
+                this.loadCurrentTabContent();
             }, 200);
         }
     }
@@ -113,21 +154,20 @@ class RecommendationManager {
         const recommendationArea = document.getElementById('recommendationArea');
         if (!recommendationArea) return;
 
-        const doubanEnabled = localStorage.getItem('doubanEnabled') === 'true';
-        const imdbEnabled = localStorage.getItem('imdbEnabled') === 'true';
+        const enabledSources = [
+            localStorage.getItem('doubanEnabled') === 'true',
+            localStorage.getItem('imdbEnabled') === 'true', 
+            localStorage.getItem('tmdbEnabled') === 'true',
+            localStorage.getItem('tvmazeEnabled') === 'true'
+        ];
+        
+        const anyEnabled = enabledSources.some(enabled => enabled);
         const isSearching = document.getElementById('resultsArea') && 
             !document.getElementById('resultsArea').classList.contains('hidden');
 
         // 只有在至少一个推荐源启用且没有搜索结果显示时才显示推荐区域
-        if ((doubanEnabled || imdbEnabled) && !isSearching) {
+        if (anyEnabled && !isSearching) {
             recommendationArea.classList.remove('hidden');
-            
-            // 根据启用状态确定默认选项卡，优先豆瓣
-            if (doubanEnabled) {
-                this.switchTab('douban');
-            } else if (imdbEnabled) {
-                this.switchTab('imdb');
-            }
             
             // 更新选项卡可见性
             this.updateTabVisibility();
@@ -140,24 +180,27 @@ class RecommendationManager {
     }
 
     updateTabVisibility() {
-        const doubanTab = document.getElementById('rec-douban-tab');
-        const imdbTab = document.getElementById('rec-imdb-tab');
-        const doubanEnabled = localStorage.getItem('doubanEnabled') === 'true';
-        const imdbEnabled = localStorage.getItem('imdbEnabled') === 'true';
+        const tabs = {
+            'rec-douban-tab': localStorage.getItem('doubanEnabled') === 'true',
+            'rec-imdb-tab': localStorage.getItem('imdbEnabled') === 'true',
+            'rec-tmdb-tab': localStorage.getItem('tmdbEnabled') === 'true',
+            'rec-tvmaze-tab': localStorage.getItem('tvmazeEnabled') === 'true'
+        };
+
+        let visibleTabs = 0;
 
         // 显示/隐藏选项卡
-        if (doubanTab) {
-            doubanTab.style.display = doubanEnabled ? 'block' : 'none';
-        }
-        
-        if (imdbTab) {
-            imdbTab.style.display = imdbEnabled ? 'block' : 'none';
-        }
+        Object.entries(tabs).forEach(([tabId, enabled]) => {
+            const tab = document.getElementById(tabId);
+            if (tab) {
+                tab.style.display = enabled ? 'block' : 'none';
+                if (enabled) visibleTabs++;
+            }
+        });
 
         // 如果只有一个选项卡，隐藏整个选项卡容器
         const tabContainer = document.querySelector('#recommendationArea .mb-6');
         if (tabContainer) {
-            const visibleTabs = (doubanEnabled ? 1 : 0) + (imdbEnabled ? 1 : 0);
             tabContainer.style.display = visibleTabs > 1 ? 'block' : 'none';
         }
     }
