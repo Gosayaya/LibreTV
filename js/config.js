@@ -106,6 +106,104 @@ const API_SITES = {
         api: 'https://ikunzyapi.com',
         name: 'iKun资源'
     },
+    // 新增的视频来源
+    kubo: {
+        api: 'https://www.kubo-api.com',
+        name: '酷播资源'
+    },
+    xinlang: {
+        api: 'https://api.xinlangapi.com',
+        name: '新浪资源'
+    },
+    subo: {
+        api: 'https://www.subocaiji.com',
+        name: '速播资源'
+    },
+    taopianhai: {
+        api: 'https://taopianhai.com',
+        name: '淘片海'
+    },
+    haiwaikan: {
+        api: 'https://haiwaikan.com',
+        name: '海外看'
+    },
+    ukuzy: {
+        api: 'https://api.ukuapi.com',
+        name: 'U酷资源'
+    },
+    zxzj: {
+        api: 'https://api.zxzjhd.com',
+        name: '在线之家'
+    },
+    bjm: {
+        api: 'https://cj.bjm3u8.com',
+        name: '八戒M3U8'
+    },
+    kuyun: {
+        api: 'https://caiji.kuyun98.com',
+        name: '酷云资源'
+    },
+    lezhutv: {
+        api: 'https://www.lezhutv.com',
+        name: '乐猪TV'
+    },
+    miaoparty: {
+        api: 'https://caiji.miaoparty3.com',
+        name: '喵派对'
+    },
+    parwix: {
+        api: 'https://api.parwix.com',
+        name: 'parwix资源'
+    },
+    hongniu: {
+        api: 'https://www.hongniuzy2.com',
+        name: '红牛资源'
+    },
+    jinyingzy: {
+        api: 'https://jinyingzy.com',
+        name: '金鹰资源'
+    },
+    // 更多专业视频源
+    okzy: {
+        api: 'https://cj.okzy.tv',
+        name: 'OK资源'
+    },
+    doubanzy: {
+        api: 'https://www.dbjfyy.com',
+        name: '豆瓣电影'
+    },
+    kyzy: {
+        api: 'https://caiji.kyzy123.com',
+        name: '快云资源'
+    },
+    tiankongy: {
+        api: 'https://api.tiankongapi.com',
+        name: '天空资源'
+    },
+    yhzy: {
+        api: 'https://api.yhzy.cc',
+        name: '影狐资源'
+    },
+    lemonsj: {
+        api: 'https://api.lemonsj.com',
+        name: '柠檬资源'
+    },
+    mgtv: {
+        api: 'https://api.shijiapi.com',
+        name: '世纪资源'
+    },
+    myapifilms: {
+        api: 'https://myapifilms.com',
+        name: 'MyAPI影片'
+    },
+    ziyuan: {
+        api: 'https://api.ziyuantv.com',
+        name: '资源TV'
+    },
+    feifei: {
+        api: 'https://cj.ffzyapi.com',
+        name: '飞飞资源'
+    },
     // testSource: {
     //     api: 'https://www.example.com',
     //     name: '空内容测试源',
@@ -241,3 +339,13 @@ const CUSTOM_API_CONFIG = {
 
 // 隐藏内置黄色采集站API的变量
 const HIDE_BUILTIN_ADULT_APIS = false;
+
+// 分页配置
+const PAGINATION_CONFIG = {
+    defaultItemsPerPage: 24,        // 默认每页显示数量
+    maxPageButtons: 7,              // 最大显示页码按钮数量
+    itemsPerPageOptions: [12, 24, 48, 96], // 每页显示选项
+    showPageInfo: true,             // 是否显示页面信息
+    scrollToTop: true,              // 翻页时是否滚动到顶部
+    storageKey: 'pagination_settings' // 存储分页设置的键名
+};

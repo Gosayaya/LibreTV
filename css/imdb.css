@@ -1,0 +1,283 @@
+/* 推荐区域样式 */
+#recommendationArea {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.05) 0%, rgba(255, 193, 7, 0.02) 100%);
+    border: 1px solid rgba(255, 193, 7, 0.1);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 选项卡样式 */
+#rec-douban-tab, #rec-imdb-tab {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#rec-douban-tab:hover, #rec-imdb-tab:hover {
+    transform: translateY(-1px);
+}
+
+/* 推荐内容切换动画 */
+.recommendation-content {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.recommendation-content.hidden {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+#recommendationArea::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f5c842, #f3e02e, #f5c842);
+    background-size: 200% 100%;
+    animation: imdbGradientShift 3s ease-in-out infinite;
+}
+
+@keyframes imdbGradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* IMDB电影卡片样式 */
+#imdb-results .movie-card {
+    background: linear-gradient(145deg, #1a1a1a, #0f0f0f);
+    border: 1px solid rgba(255, 193, 7, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+#imdb-results .movie-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 193, 7, 0.1), transparent);
+    transition: left 0.5s ease-in-out;
+}
+
+#imdb-results .movie-card:hover::before {
+    left: 100%;
+}
+
+#imdb-results .movie-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: rgba(255, 193, 7, 0.3);
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(255, 193, 7, 0.1);
+}
+
+/* IMDB评分标签样式 */
+#imdb-results .movie-card .absolute {
+    background: linear-gradient(135deg, rgba(245, 200, 66, 0.9), rgba(243, 224, 46, 0.9));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+/* IMDB控制按钮样式 */
+#imdb-movie-toggle, #imdb-series-toggle {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#imdb-movie-toggle::before, #imdb-series-toggle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 193, 7, 0.2), transparent);
+    transition: left 0.3s ease;
+}
+
+#imdb-movie-toggle:hover::before, #imdb-series-toggle:hover::before {
+    left: 100%;
+}
+
+/* IMDB刷新按钮样式 */
+#imdb-refresh {
+    background: linear-gradient(135deg, #f5c842, #f3e02e);
+    position: relative;
+    overflow: hidden;
+}
+
+#imdb-refresh::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.3s ease;
+}
+
+#imdb-refresh:hover::before {
+    left: 100%;
+}
+
+#imdb-refresh:hover {
+    background: linear-gradient(135deg, #f3e02e, #f5c842);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 200, 66, 0.3);
+}
+
+/* IMDB分页样式 */
+#imdb-pagination .bg-yellow-600 {
+    background: linear-gradient(135deg, #f5c842, #f3e02e);
+    border-color: #f5c842;
+    position: relative;
+    overflow: hidden;
+}
+
+#imdb-pagination .bg-yellow-600::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.3s ease;
+}
+
+#imdb-pagination .bg-yellow-600:hover::before {
+    left: 100%;
+}
+
+/* IMDB加载动画 */
+.imdb-loading {
+    position: relative;
+    color: #f5c842;
+}
+
+.imdb-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(245, 200, 66, 0.3);
+    border-top: 2px solid #f5c842;
+    border-radius: 50%;
+    animation: imdbSpin 1s linear infinite;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes imdbSpin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 推荐区域响应式设计 */
+@media (max-width: 768px) {
+    #recommendationArea {
+        margin: 1rem 0;
+        border-radius: 8px;
+    }
+    
+    #recommendationArea .flex.items-center.justify-between {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    #recommendationArea .flex.items-center.space-x-3 {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+    
+    #imdb-results {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    #imdb-pagination {
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+    
+    #imdb-pagination button {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #recommendationArea .flex.items-center {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    #recommendationArea h2 {
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    #recommendationArea .flex.items-center.bg-\[#222\] {
+        justify-content: center;
+    }
+}
+
+/* IMDB标题渐变效果 */
+#imdb-content h2 {
+    background: linear-gradient(135deg, #f5c842, #f3e02e, #f5c842);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: imdbTitleGradient 3s ease-in-out infinite;
+}
+
+@keyframes imdbTitleGradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* IMDB选择器样式增强 */
+#imdb-genre, #imdb-page-size {
+    background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+    border-color: rgba(255, 193, 7, 0.2);
+    transition: all 0.3s ease;
+}
+
+#imdb-genre:focus, #imdb-page-size:focus {
+    border-color: #f5c842;
+    box-shadow: 0 0 10px rgba(245, 200, 66, 0.2);
+    outline: none;
+}
+
+#imdb-genre:hover, #imdb-page-size:hover {
+    border-color: rgba(255, 193, 7, 0.4);
+}
+
+/* IMDB占位图片样式 */
+#imdb-results .movie-card img[src*="placeholder"] {
+    background: linear-gradient(135deg, #333, #222);
+    position: relative;
+}
+
+#imdb-results .movie-card img[src*="placeholder"]::before {
+    content: '🎬';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    opacity: 0.5;
+} 

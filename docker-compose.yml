@@ -1,4 +1,3 @@
-version: '3'
 services:
   libretv:
     image: bestzwei/libretv:latest

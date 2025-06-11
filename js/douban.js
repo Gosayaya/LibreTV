@@ -1,12 +1,45 @@
 // 豆瓣热门电影电视剧推荐功能
 
-// 豆瓣标签列表 - 修改为默认标签
-let defaultMovieTags = ['热门', '最新', '经典', '豆瓣高分', '冷门佳片', '华语', '欧美', '韩国', '日本', '动作', '喜剧', '爱情', '科幻', '悬疑', '恐怖', '治愈'];
-let defaultTvTags = ['热门', '美剧', '英剧', '韩剧', '日剧', '国产剧', '港剧', '日本动画', '综艺', '纪录片'];
+// 豆瓣标签列表 - 扩展版默认标签
+let defaultMovieTags = [
+    // 热门分类
+    '热门', '最新', '经典', '豆瓣高分', '冷门佳片', 'TOP250',
+    
+    // 地区分类
+    '华语', '欧美', '韩国', '日本', '法国', '英国', '意大利', '西班牙', '德国', '俄国', '印度', '泰国',
+    
+    // 类型分类
+    '动作', '喜剧', '爱情', '科幻', '悬疑', '恐怖', '治愈', '剧情', '惊悚', '犯罪', '战争', '历史', 
+    '传记', '音乐', '运动', '家庭', '儿童', '动画', '纪录片', '短片',
+    
+    // 年代分类
+    '2020年代', '2010年代', '2000年代', '90年代', '80年代', '经典老片',
+    
+    // 特殊分类
+    '女性', '同性', '黑色幽默', '超级英雄', '灾难', '青春', '校园', '职场'
+];
+
+let defaultTvTags = [
+    // 热门分类
+    '热门', '最新', '经典', '高分剧集',
+    
+    // 地区分类
+    '美剧', '英剧', '韩剧', '日剧', '国产剧', '港剧', '台剧', '泰剧', '土耳其剧', '西班牙剧',
+    
+    // 类型分类
+    '都市', '古装', '偶像剧', '悬疑剧', '犯罪剧', '医疗剧', '律政剧', '职场剧', '家庭剧', '青春剧',
+    '科幻剧', '奇幻剧', '历史剧', '战争剧', '喜剧剧', '情景喜剧',
+    
+    // 特殊分类
+    '日本动画', '欧美动画', '国产动画', '综艺', '纪录片', '真人秀', '脱口秀', '音乐节目',
+    
+    // 题材分类
+    '穿越', '重生', '宫斗', '江湖', '军旅', '农村', '都市情感', '家族saga'
+];
 
 // 用户标签列表 - 存储用户实际使用的标签（包含保留的系统标签和用户添加的自定义标签）
-let movieTags = ['伦理片','福利','里番动漫','门事件','萝莉少女','制服诱惑','国产传媒','cosplay','黑丝诱惑','无码','日本无码','有码','日本有码','SWAG','网红主播', '色情片','同性片','福利视频','福利片'];
-let tvTags = [];
+let movieTags = [...defaultMovieTags];
+let tvTags = [...defaultTvTags];
 
 // 加载用户标签
 function loadUserTags() {
@@ -15,20 +48,62 @@ function loadUserTags() {
         const savedMovieTags = localStorage.getItem('userMovieTags');
         const savedTvTags = localStorage.getItem('userTvTags');
         
-        // 如果本地存储中有标签数据，则使用它
+        // 不当内容过滤列表
+        const inappropriateContent = [
+            '伦理片', '福利', '里番动漫', '门事件', '萝莉少女', '制服诱惑', 
+            '国产传媒', 'cosplay', '黑丝诱惑', '无码', '日本无码', '有码', 
+            '日本有码', 'SWAG', '网红主播', '色情片', '同性片', '福利视频', '福利片'
+        ];
+        
+        // 过滤函数
+        const filterTags = (tags) => {
+            return tags.filter(tag => !inappropriateContent.includes(tag));
+        };
+        
+        // 如果本地存储中有标签数据，则使用它（但要过滤不当内容）
         if (savedMovieTags) {
-            movieTags = JSON.parse(savedMovieTags);
+            const parsedMovieTags = JSON.parse(savedMovieTags);
+            const filteredMovieTags = filterTags(parsedMovieTags);
+            
+            // 如果过滤后标签太少，使用默认标签
+            if (filteredMovieTags.length < 5) {
+                movieTags = [...defaultMovieTags];
+                console.log('电影标签被重置为默认标签（过滤不当内容后标签不足）');
+            } else {
+                movieTags = filteredMovieTags;
+            }
         } else {
             // 否则使用默认标签
             movieTags = [...defaultMovieTags];
         }
         
         if (savedTvTags) {
-            tvTags = JSON.parse(savedTvTags);
+            const parsedTvTags = JSON.parse(savedTvTags);
+            const filteredTvTags = filterTags(parsedTvTags);
+            
+            // 如果过滤后标签太少，使用默认标签
+            if (filteredTvTags.length < 3) {
+                tvTags = [...defaultTvTags];
+                console.log('电视剧标签被重置为默认标签（过滤不当内容后标签不足）');
+            } else {
+                tvTags = filteredTvTags;
+            }
         } else {
             // 否则使用默认标签
             tvTags = [...defaultTvTags];
         }
+        
+        // 确保热门标签始终存在
+        if (!movieTags.includes('热门')) {
+            movieTags.unshift('热门');
+        }
+        if (!tvTags.includes('热门')) {
+            tvTags.unshift('热门');
+        }
+        
+        // 保存清理后的标签
+        saveUserTags();
+        
     } catch (e) {
         console.error('加载标签失败：', e);
         // 初始化为默认值，防止错误
@@ -51,7 +126,278 @@ function saveUserTags() {
 let doubanMovieTvCurrentSwitch = 'movie';
 let doubanCurrentTag = '热门';
 let doubanPageStart = 0;
-const doubanPageSize = 16; // 一次显示的项目数量
+let doubanPageSize = 24; // 一次显示的项目数量
+let doubanCurrentSort = 'recommend'; // 当前排序方式
+
+// 豆瓣分页管理器
+class DoubanPagination {
+    constructor() {
+        this.currentPage = 1;
+        this.itemsPerPage = 24;
+        this.totalPages = 1;
+        this.allResults = [];
+        this.currentSort = 'recommend';
+        
+        this.bindEvents();
+        this.loadSettings();
+    }
+    
+    bindEvents() {
+        // 排序选择
+        const sortSelect = document.getElementById('douban-sort');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => {
+                this.currentSort = e.target.value;
+                doubanCurrentSort = e.target.value;
+                this.saveSettings();
+                this.refreshData();
+            });
+        }
+        
+        // 每页显示数量
+        const pageSizeSelect = document.getElementById('douban-page-size');
+        if (pageSizeSelect) {
+            pageSizeSelect.addEventListener('change', (e) => {
+                this.itemsPerPage = parseInt(e.target.value);
+                doubanPageSize = parseInt(e.target.value);
+                this.currentPage = 1;
+                this.saveSettings();
+                this.refreshData();
+            });
+        }
+        
+        // 分页按钮
+        const firstPageBtn = document.getElementById('douban-first-page');
+        if (firstPageBtn) {
+            firstPageBtn.addEventListener('click', () => this.goToPage(1));
+        }
+        
+        const prevPageBtn = document.getElementById('douban-prev-page');
+        if (prevPageBtn) {
+            prevPageBtn.addEventListener('click', () => this.goToPage(this.currentPage - 1));
+        }
+        
+        const nextPageBtn = document.getElementById('douban-next-page');
+        if (nextPageBtn) {
+            nextPageBtn.addEventListener('click', () => this.goToPage(this.currentPage + 1));
+        }
+        
+        const lastPageBtn = document.getElementById('douban-last-page');
+        if (lastPageBtn) {
+            lastPageBtn.addEventListener('click', () => this.goToPage(this.totalPages));
+        }
+    }
+    
+    loadSettings() {
+        try {
+            const savedSettings = localStorage.getItem('douban_pagination_settings');
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                this.itemsPerPage = settings.itemsPerPage || 24;
+                this.currentSort = settings.sort || 'recommend';
+                
+                // 兼容旧版本：如果保存的是 'rank'，转换为 'rating'
+                if (this.currentSort === 'rank') {
+                    this.currentSort = 'rating';
+                }
+                
+                // 更新UI
+                const pageSizeSelect = document.getElementById('douban-page-size');
+                if (pageSizeSelect) {
+                    pageSizeSelect.value = this.itemsPerPage;
+                }
+                
+                const sortSelect = document.getElementById('douban-sort');
+                if (sortSelect) {
+                    sortSelect.value = this.currentSort;
+                }
+                
+                // 更新全局变量
+                doubanPageSize = this.itemsPerPage;
+                doubanCurrentSort = this.currentSort;
+            }
+        } catch (e) {
+            console.warn('加载豆瓣分页设置失败:', e);
+        }
+    }
+    
+    saveSettings() {
+        try {
+            const settings = {
+                itemsPerPage: this.itemsPerPage,
+                sort: this.currentSort
+            };
+            localStorage.setItem('douban_pagination_settings', JSON.stringify(settings));
+        } catch (e) {
+            console.warn('保存豆瓣分页设置失败:', e);
+        }
+    }
+    
+    refreshData() {
+        renderRecommend(doubanCurrentTag, this.itemsPerPage, (this.currentPage - 1) * this.itemsPerPage);
+    }
+    
+    goToPage(page) {
+        if (page < 1 || page > this.totalPages || page === this.currentPage) {
+            return;
+        }
+        
+        this.currentPage = page;
+        this.updatePageInfo();
+        this.updatePaginationButtons();
+        this.refreshData();
+        
+        // 滚动到豆瓣区域顶部
+        const doubanArea = document.getElementById('doubanArea');
+        if (doubanArea) {
+            doubanArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+    
+    updatePageInfo() {
+        const pageInfo = document.getElementById('douban-page-info');
+        const currentPageSpan = document.getElementById('douban-current-page');
+        const totalItemsSpan = document.getElementById('douban-total-items');
+        
+        if (currentPageSpan) {
+            currentPageSpan.textContent = this.currentPage;
+        }
+        if (totalItemsSpan) {
+            totalItemsSpan.textContent = this.totalPages * this.itemsPerPage;
+        }
+        
+        if (pageInfo && this.totalPages > 1) {
+            pageInfo.classList.remove('hidden');
+        } else if (pageInfo) {
+            pageInfo.classList.add('hidden');
+        }
+    }
+    
+    updatePaginationButtons() {
+        const pagination = document.getElementById('douban-pagination');
+        if (!pagination) return;
+        
+        if (this.totalPages <= 1) {
+            pagination.classList.add('hidden');
+            return;
+        }
+        
+        pagination.classList.remove('hidden');
+        
+        // 更新按钮状态
+        const firstPageBtn = document.getElementById('douban-first-page');
+        const prevPageBtn = document.getElementById('douban-prev-page');
+        const nextPageBtn = document.getElementById('douban-next-page');
+        const lastPageBtn = document.getElementById('douban-last-page');
+        
+        if (firstPageBtn) {
+            firstPageBtn.disabled = this.currentPage === 1;
+        }
+        if (prevPageBtn) {
+            prevPageBtn.disabled = this.currentPage === 1;
+        }
+        if (nextPageBtn) {
+            nextPageBtn.disabled = this.currentPage === this.totalPages;
+        }
+        if (lastPageBtn) {
+            lastPageBtn.disabled = this.currentPage === this.totalPages;
+        }
+        
+        // 更新页码按钮
+        this.updatePageNumbers();
+    }
+    
+    updatePageNumbers() {
+        const pageNumbers = document.getElementById('douban-page-numbers');
+        if (!pageNumbers) return;
+        
+        pageNumbers.innerHTML = '';
+        
+        const maxButtons = 5; // 最多显示5个页码按钮
+        const range = this.getPageNumberRange(maxButtons);
+        
+        range.forEach(pageNum => {
+            if (pageNum === '...') {
+                const ellipsis = document.createElement('span');
+                ellipsis.className = 'px-3 py-2 text-gray-500';
+                ellipsis.textContent = '...';
+                pageNumbers.appendChild(ellipsis);
+            } else {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `page-number-btn ${pageNum === this.currentPage ? 'active' : ''}`;
+                pageBtn.textContent = pageNum;
+                pageBtn.addEventListener('click', () => this.goToPage(pageNum));
+                pageNumbers.appendChild(pageBtn);
+            }
+        });
+    }
+    
+    getPageNumberRange(maxButtons) {
+        const current = this.currentPage;
+        const total = this.totalPages;
+        
+        if (total <= maxButtons) {
+            return Array.from({ length: total }, (_, i) => i + 1);
+        }
+        
+        const halfButtons = Math.floor(maxButtons / 2);
+        let start = Math.max(1, current - halfButtons);
+        let end = Math.min(total, current + halfButtons);
+        
+        if (end - start + 1 < maxButtons) {
+            if (start === 1) {
+                end = Math.min(total, start + maxButtons - 1);
+            } else {
+                start = Math.max(1, end - maxButtons + 1);
+            }
+        }
+        
+        const range = [];
+        
+        if (start > 1) {
+            range.push(1);
+            if (start > 2) {
+                range.push('...');
+            }
+        }
+        
+        for (let i = start; i <= end; i++) {
+            range.push(i);
+        }
+        
+        if (end < total) {
+            if (end < total - 1) {
+                range.push('...');
+            }
+            range.push(total);
+        }
+        
+        return range;
+    }
+    
+    // 估算总页数（豆瓣API不提供总数，我们估算一个合理的值）
+    estimateTotalPages() {
+        // 豆瓣通常每个分类有几百个结果，我们估算最多10页
+        this.totalPages = Math.min(10, Math.max(3, this.currentPage + 2));
+        this.updatePageInfo();
+        this.updatePaginationButtons();
+    }
+    
+    hide() {
+        const pagination = document.getElementById('douban-pagination');
+        const pageInfo = document.getElementById('douban-page-info');
+        
+        if (pagination) {
+            pagination.classList.add('hidden');
+        }
+        if (pageInfo) {
+            pageInfo.classList.add('hidden');
+        }
+    }
+}
+
+// 创建豆瓣分页管理器实例
+const doubanPaginationManager = new DoubanPagination();
 
 // 初始化豆瓣功能
 function initDouban() {
@@ -110,26 +456,20 @@ function initDouban() {
     if (localStorage.getItem('doubanEnabled') === 'true') {
         renderRecommend(doubanCurrentTag, doubanPageSize, doubanPageStart);
     }
+    
+    // 初始化分页管理器事件（延迟执行确保DOM已加载）
+    setTimeout(() => {
+        if (doubanPaginationManager) {
+            doubanPaginationManager.bindEvents();
+        }
+    }, 100);
 }
 
 // 根据设置更新豆瓣区域的显示状态
 function updateDoubanVisibility() {
-    const doubanArea = document.getElementById('doubanArea');
-    if (!doubanArea) return;
-    
-    const isEnabled = localStorage.getItem('doubanEnabled') === 'true';
-    const isSearching = document.getElementById('resultsArea') && 
-        !document.getElementById('resultsArea').classList.contains('hidden');
-    
-    // 只有在启用且没有搜索结果显示时才显示豆瓣区域
-    if (isEnabled && !isSearching) {
-        doubanArea.classList.remove('hidden');
-        // 如果豆瓣结果为空，重新加载
-        if (document.getElementById('douban-results').children.length === 0) {
-            renderRecommend(doubanCurrentTag, doubanPageSize, doubanPageStart);
-        }
-    } else {
-        doubanArea.classList.add('hidden');
+    // 使用新的推荐管理器
+    if (typeof recommendationManager !== 'undefined' && recommendationManager) {
+        recommendationManager.updateVisibility();
     }
 }
 
@@ -324,6 +664,12 @@ function renderDoubanTags(tags) {
             if (doubanCurrentTag !== tag) {
                 doubanCurrentTag = tag;
                 doubanPageStart = 0;
+                
+                // 重置分页到第一页
+                if (doubanPaginationManager) {
+                    doubanPaginationManager.currentPage = 1;
+                }
+                
                 renderRecommend(doubanCurrentTag, doubanPageSize, doubanPageStart);
                 renderDoubanTags();
             }
@@ -391,12 +737,44 @@ function renderRecommend(tag, pageLimit, pageStart) {
     container.classList.add("relative");
     container.insertAdjacentHTML('beforeend', loadingOverlayHTML);
     
-    const target = `https://movie.douban.com/j/search_subjects?type=${doubanMovieTvCurrentSwitch}&tag=${tag}&sort=recommend&page_limit=${pageLimit}&page_start=${pageStart}`;
+    // 使用当前选择的排序方式
+    let sortParam = doubanCurrentSort || 'recommend';
+    
+    // 豆瓣API可能不支持某些排序参数，统一使用recommend获取数据，然后在客户端排序
+    let apiSortParam = 'recommend';
+    if (sortParam === 'time') {
+        apiSortParam = 'time'; // 时间排序豆瓣API支持
+    }
+    
+    const target = `https://movie.douban.com/j/search_subjects?type=${doubanMovieTvCurrentSwitch}&tag=${tag}&sort=${apiSortParam}&page_limit=${pageLimit}&page_start=${pageStart}`;
+    
+    console.log('豆瓣API请求URL:', target);
+    console.log('当前排序参数:', sortParam, '实际API参数:', apiSortParam);
     
     // 使用通用请求函数
     fetchDoubanData(target)
         .then(data => {
+            console.log('豆瓣API返回数据:', data);
+            
+            // 如果需要按评分排序且有数据，在客户端进行排序
+            if (data.subjects && data.subjects.length > 0 && sortParam === 'rating') {
+                console.log('执行客户端评分排序');
+                data.subjects.sort((a, b) => {
+                    const rateA = parseFloat(a.rate) || 0;
+                    const rateB = parseFloat(b.rate) || 0;
+                    return rateB - rateA; // 按评分从高到低排序
+                });
+            }
+            
+            return data;
+        })
+        .then(data => {
             renderDoubanCards(data, container);
+            
+            // 更新分页信息（如果需要）
+            if (doubanPaginationManager) {
+                doubanPaginationManager.estimateTotalPages();
+            }
         })
         .catch(error => {
             console.error("获取豆瓣数据失败：", error);
@@ -406,6 +784,11 @@ function renderRecommend(tag, pageLimit, pageStart) {
                     <div class="text-gray-500 text-sm mt-2">提示：使用VPN可能有助于解决此问题</div>
                 </div>
             `;
+            
+            // 隐藏分页控件
+            if (doubanPaginationManager) {
+                doubanPaginationManager.hide();
+            }
         });
 }
 

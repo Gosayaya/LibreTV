@@ -893,3 +893,164 @@ body {
     opacity: 0;
     transform: translateX(-50%) translateY(-100%);
 }
+
+/* 分页样式 */
+#pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#pagination button {
+    transition: all 0.2s ease;
+    border: 1px solid #333;
+    min-width: 40px;
+    height: 40px;
+    font-size: 14px;
+}
+
+#pagination button:hover:not(:disabled) {
+    background-color: #222;
+    border-color: #555;
+    color: white;
+    transform: translateY(-1px);
+}
+
+#pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #0a0a0a;
+}
+
+#pagination button.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+#pagination button.active:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.page-number-btn {
+    min-width: 40px;
+    height: 40px;
+    padding: 8px 12px;
+    background-color: #111;
+    border: 1px solid #333;
+    color: #888;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.page-number-btn:hover {
+    background-color: #222;
+    color: white;
+    border-color: #555;
+    transform: translateY(-1px);
+}
+
+.page-number-btn.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.page-number-btn.active:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 分页响应式优化 */
+@media (max-width: 640px) {
+    #pagination {
+        gap: 4px;
+    }
+    
+    #pagination button,
+    .page-number-btn {
+        min-width: 36px;
+        height: 36px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+    
+    #firstPageBtn,
+    #lastPageBtn {
+        display: none; /* 在小屏幕上隐藏首页和尾页按钮 */
+    }
+}
+
+/* 豆瓣分页样式 */
+#douban-pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#douban-pagination button {
+    transition: all 0.2s ease;
+    border: 1px solid #333;
+    min-width: 40px;
+    height: 40px;
+    font-size: 14px;
+}
+
+#douban-pagination button:hover:not(:disabled) {
+    background-color: #222;
+    border-color: #555;
+    color: white;
+    transform: translateY(-1px);
+}
+
+#douban-pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #0a0a0a;
+}
+
+#douban-pagination .page-number-btn.active {
+    background: linear-gradient(135deg, #e91e63 0%, #9c27b0 100%);
+    color: white;
+    border-color: #e91e63;
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);
+}
+
+#douban-pagination .page-number-btn.active:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
+}
+
+/* 豆瓣控制区域响应式布局 */
+@media (max-width: 768px) {
+    #doubanArea .flex.items-center.space-x-3 {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: stretch;
+    }
+    
+    #doubanArea .flex.items-center.space-x-3 > div {
+        display: flex;
+        justify-content: center;
+    }
+    
+    #douban-pagination {
+        gap: 4px;
+    }
+    
+    #douban-pagination button {
+        min-width: 36px;
+        height: 36px;
+        font-size: 12px;
+        padding: 6px 8px;
+    }
+    
+    #douban-first-page,
+    #douban-last-page {
+        display: none; /* 在小屏幕上隐藏首页和尾页按钮 */
+    }
+}
