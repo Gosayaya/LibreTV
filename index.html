@@ -207,6 +207,39 @@
                     </div>
                 </div>
 
+                <!-- TMDB API密钥配置 -->
+                <div class="p-3 bg-[#151515] rounded-lg shadow-inner">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-medium text-gray-400 border-b border-[#333] w-full pb-1">TMDB API 配置</label>
+                        <button onclick="showTmdbApiHelp()" class="bg-[#333] hover:bg-[#444] text-white w-6 h-6 rounded-full text-center leading-none text-sm ml-1">?</button>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2">配置您的TMDB API密钥以获取电影数据</p>
+                    
+                    <!-- API密钥输入 -->
+                    <div class="mb-2">
+                        <input type="password" id="tmdbApiKeyInput" placeholder="输入您的TMDB API密钥" 
+                               class="w-full bg-[#222] border border-[#333] text-white px-3 py-2 rounded text-sm focus:outline-none focus:border-white transition-colors">
+                    </div>
+                    
+                    <!-- 操作按钮 -->
+                    <div class="flex space-x-2">
+                        <button onclick="saveTmdbApiKey()" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded">
+                            保存
+                        </button>
+                        <button onclick="testTmdbApiKey()" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded">
+                            测试
+                        </button>
+                        <button onclick="clearTmdbApiKey()" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded">
+                            清除
+                        </button>
+                    </div>
+                    
+                    <!-- 状态显示 -->
+                    <div id="tmdbApiStatus" class="text-xs mt-2 text-gray-500">
+                        <!-- 状态信息将在这里显示 -->
+                    </div>
+                </div>
+
                 <!-- TVMaze推荐开关 -->
                 <div class="flex items-center justify-between p-3 bg-[#151515] rounded-lg mb-3 shadow-inner">
                     <div>
@@ -217,6 +250,21 @@
                         <input type="checkbox" id="tvmazeToggle" class="opacity-0 absolute w-full h-full cursor-pointer z-10">
                         <div class="toggle-bg bg-[#333] w-12 h-6 rounded-full transition-colors duration-300 ease-in-out"></div>
                         <div class="toggle-dot absolute w-5 h-5 bg-white rounded-full top-0.5 left-0.5 transition-transform duration-300 ease-in-out"></div>
+                    </div>
+                </div>
+
+                <!-- 黄色站点黑名单管理 -->
+                <div class="p-3 bg-[#151515] rounded-lg shadow-inner">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="block text-sm font-medium text-gray-400 border-b border-[#333] w-full pb-1">黄色站点黑名单</label>
+                        <button onclick="showBlacklistManager()" class="bg-[#333] hover:bg-[#444] text-white w-6 h-6 rounded-full text-center leading-none text-sm ml-1">⚙</button>
+                    </div>
+                    <p class="text-xs text-gray-500 mb-2">管理被屏蔽的成人内容网站域名</p>
+                    
+                    <!-- 黑名单统计 -->
+                    <div class="text-xs text-gray-500 flex justify-between items-center">
+                        <span>已屏蔽站点：<span id="blacklistCount" class="text-white">0</span> 个</span>
+                        <button onclick="resetBlacklist()" class="text-red-400 hover:text-red-300 text-xs">重置默认</button>
                     </div>
                 </div>
             </div>
@@ -742,6 +790,73 @@
         </div>
     </div>
 
+    <!-- 黑名单管理模态框 -->
+    <div id="blacklistModal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[70] transition-opacity duration-300">
+        <div class="bg-[#111] p-8 rounded-lg w-11/12 max-w-2xl border border-[#333] max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center mb-6 flex-none">
+                <h2 class="text-2xl font-bold gradient-text">黄色站点黑名单管理</h2>
+                <button onclick="closeBlacklistModal()" class="text-gray-400 hover:text-white text-2xl transition-colors flex-shrink-0">&times;</button>
+            </div>
+            
+            <div class="flex-1 min-h-0 flex flex-col">
+                <!-- 添加域名部分 -->
+                <div class="mb-4 p-4 bg-[#151515] rounded-lg">
+                    <h3 class="text-lg font-medium text-white mb-3">添加域名到黑名单</h3>
+                    <div class="flex space-x-2">
+                        <input type="text" id="newDomainInput" placeholder="输入域名，如：example.com" 
+                               class="flex-1 bg-[#222] border border-[#333] text-white px-3 py-2 rounded focus:outline-none focus:border-white transition-colors">
+                        <button onclick="addDomainToBlacklist()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded transition-colors">
+                            添加
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 黑名单列表 -->
+                <div class="flex-1 min-h-0">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-lg font-medium text-white">当前黑名单 (<span id="modalBlacklistCount">0</span> 个)</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="exportBlacklist()" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded">
+                                导出
+                            </button>
+                            <button onclick="importBlacklist()" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded">
+                                导入
+                            </button>
+                            <button onclick="resetBlacklistToDefault()" class="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded">
+                                重置默认
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 搜索过滤 -->
+                    <div class="mb-3">
+                        <input type="text" id="blacklistSearchInput" placeholder="搜索域名..." 
+                               class="w-full bg-[#222] border border-[#333] text-white px-3 py-2 rounded text-sm focus:outline-none focus:border-white transition-colors"
+                               onkeyup="filterBlacklistDisplay()">
+                    </div>
+                    
+                    <!-- 域名列表 -->
+                    <div id="blacklistContainer" class="bg-[#222] rounded-lg p-3 max-h-64 overflow-y-auto">
+                        <!-- 动态生成的域名列表 -->
+                    </div>
+                </div>
+                
+                <!-- 底部操作 -->
+                <div class="mt-4 flex justify-between items-center pt-4 border-t border-[#333]">
+                    <div class="text-sm text-gray-400">
+                        <span>提示：黄色内容过滤启用时，这些域名的内容将被自动屏蔽</span>
+                    </div>
+                    <button onclick="closeBlacklistModal()" class="px-4 py-2 bg-[#333] hover:bg-[#444] text-white rounded transition-colors">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 隐藏的文件输入，用于导入黑名单 -->
+    <input type="file" id="blacklistFileInput" accept=".json,.txt" style="display: none;" onchange="handleBlacklistImport(event)">
+
     <!-- JSON-LD 结构化数据 -->
     <script type="application/ld+json">
     {
@@ -774,6 +889,7 @@
     <script src="js/imdb.js"></script>
     <script src="js/tmdb.js"></script>
     <script src="js/tvmaze.js"></script>
+    <script src="js/adult-sites-filter.js"></script>
     <script src="js/recommendation.js"></script>
 
     <!-- PWA 注册 -->

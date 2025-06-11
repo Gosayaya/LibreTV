@@ -676,7 +676,11 @@ async function search() {
 
         // 处理搜索结果过滤：如果启用了黄色内容过滤，则过滤掉分类含有敏感内容的项目
         const yellowFilterEnabled = localStorage.getItem('yellowFilterEnabled') === 'true';
-        if (yellowFilterEnabled) {
+        if (yellowFilterEnabled && window.adultSitesFilter) {
+            // 使用新的过滤器
+            allResults = window.adultSitesFilter.filterSearchResults(allResults);
+        } else if (yellowFilterEnabled) {
+            // 后备方案：使用原始的过滤逻辑
             const banned = ['伦理片','福利','里番动漫','门事件','萝莉少女','制服诱惑','国产传媒','cosplay','黑丝诱惑','无码','日本无码','有码','日本有码','SWAG','网红主播', '色情片','同性片','福利视频','福利片'];
             allResults = allResults.filter(item => {
                 const typeName = item.type_name || '';
@@ -1034,14 +1038,313 @@ function saveStringAsFile(content, fileName) {
     window.URL.revokeObjectURL(url);
 }
 
-// app.js 或路由文件中
-const authMiddleware = require('./middleware/auth');
-const config = require('./config');
-
-// 对所有请求启用鉴权（按需调整作用范围）
-if (config.auth.enabled) {
-  app.use(authMiddleware);
+// 黑名单管理功能
+function updateBlacklistCount() {
+    if (window.adultSitesFilter) {
+        const count = window.adultSitesFilter.getBlacklist().length;
+        const countElement = document.getElementById('blacklistCount');
+        const modalCountElement = document.getElementById('modalBlacklistCount');
+        
+        if (countElement) countElement.textContent = count;
+        if (modalCountElement) modalCountElement.textContent = count;
+    }
 }
 
-// 或者针对特定路由
-app.use('/api', authMiddleware);
+function showBlacklistManager() {
+    const modal = document.getElementById('blacklistModal');
+    if (modal) {
+        updateBlacklistDisplay();
+        modal.style.display = 'flex';
+    }
+}
+
+function closeBlacklistModal() {
+    const modal = document.getElementById('blacklistModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function updateBlacklistDisplay() {
+    if (!window.adultSitesFilter) return;
+    
+    const container = document.getElementById('blacklistContainer');
+    const searchInput = document.getElementById('blacklistSearchInput');
+    const blacklist = window.adultSitesFilter.getBlacklist();
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    
+    // 过滤域名
+    const filteredList = blacklist.filter(domain => 
+        domain.toLowerCase().includes(searchTerm)
+    );
+    
+    if (container) {
+        if (filteredList.length === 0) {
+            container.innerHTML = '<div class="text-center text-gray-400 py-4">没有找到匹配的域名</div>';
+        } else {
+            container.innerHTML = filteredList.map((domain, index) => `
+                <div class="flex items-center justify-between py-2 px-3 bg-[#333] rounded mb-2">
+                    <span class="text-white text-sm">${domain}</span>
+                    <button onclick="removeDomainFromBlacklist('${domain}')" 
+                            class="text-red-400 hover:text-red-300 text-sm px-2 py-1 rounded hover:bg-red-600/20 transition-colors"
+                            title="移除此域名">
+                        删除
+                    </button>
+                </div>
+            `).join('');
+        }
+    }
+    
+    updateBlacklistCount();
+}
+
+function filterBlacklistDisplay() {
+    updateBlacklistDisplay();
+}
+
+function addDomainToBlacklist() {
+    const input = document.getElementById('newDomainInput');
+    if (!input || !window.adultSitesFilter) return;
+    
+    const domain = input.value.trim();
+    if (!domain) {
+        showToast('请输入有效的域名', 'error');
+        return;
+    }
+    
+    // 简单的域名验证
+    const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    if (!domainRegex.test(domain)) {
+        showToast('域名格式不正确', 'error');
+        return;
+    }
+    
+    if (window.adultSitesFilter.addToBlacklist(domain)) {
+        input.value = '';
+        updateBlacklistDisplay();
+        showToast(`已添加 ${domain} 到黑名单`, 'success');
+    } else {
+        showToast('该域名已存在于黑名单中', 'warning');
+    }
+}
+
+function removeDomainFromBlacklist(domain) {
+    if (window.adultSitesFilter && window.adultSitesFilter.removeFromBlacklist(domain)) {
+        updateBlacklistDisplay();
+        showToast(`已从黑名单移除 ${domain}`, 'success');
+    }
+}
+
+function resetBlacklist() {
+    if (confirm('确定要重置黑名单为默认设置吗？这将删除所有自定义添加的域名。')) {
+        if (window.adultSitesFilter) {
+            window.adultSitesFilter.resetToDefault();
+            updateBlacklistCount();
+            showToast('黑名单已重置为默认设置', 'success');
+        }
+    }
+}
+
+function resetBlacklistToDefault() {
+    if (confirm('确定要重置黑名单为默认设置吗？这将删除所有自定义添加的域名。')) {
+        if (window.adultSitesFilter) {
+            window.adultSitesFilter.resetToDefault();
+            updateBlacklistDisplay();
+            showToast('黑名单已重置为默认设置', 'success');
+        }
+    }
+}
+
+function exportBlacklist() {
+    if (!window.adultSitesFilter) return;
+    
+    const blacklist = window.adultSitesFilter.getBlacklist();
+    const data = {
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        blacklist: blacklist
+    };
+    
+    const content = JSON.stringify(data, null, 2);
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/[:\-]/g, '');
+    saveStringAsFile(content, `adult-sites-blacklist-${timestamp}.json`);
+    showToast('黑名单已导出', 'success');
+}
+
+function importBlacklist() {
+    const fileInput = document.getElementById('blacklistFileInput');
+    if (fileInput) {
+        fileInput.click();
+    }
+}
+
+function handleBlacklistImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            let importedData;
+            
+            if (file.name.endsWith('.json')) {
+                const data = JSON.parse(e.target.result);
+                importedData = data.blacklist || data;
+            } else {
+                // 处理纯文本文件，每行一个域名
+                importedData = e.target.result.split('\n')
+                    .map(line => line.trim())
+                    .filter(line => line.length > 0);
+            }
+            
+            if (!Array.isArray(importedData)) {
+                throw new Error('无效的文件格式');
+            }
+            
+            // 合并到现有黑名单
+            let addedCount = 0;
+            importedData.forEach(domain => {
+                if (window.adultSitesFilter.addToBlacklist(domain)) {
+                    addedCount++;
+                }
+            });
+            
+            updateBlacklistDisplay();
+            showToast(`成功导入 ${addedCount} 个新域名`, 'success');
+            
+        } catch (error) {
+            console.error('导入黑名单失败:', error);
+            showToast('导入失败，请检查文件格式', 'error');
+        }
+    };
+    
+    reader.readAsText(file);
+    event.target.value = ''; // 清空文件输入
+}
+
+// TMDB API密钥管理功能
+function loadTmdbApiKey() {
+    const apiKey = localStorage.getItem('tmdbApiKey');
+    const input = document.getElementById('tmdbApiKeyInput');
+    const status = document.getElementById('tmdbApiStatus');
+    
+    if (input && apiKey) {
+        input.value = apiKey;
+    }
+    
+    if (status) {
+        if (apiKey) {
+            status.innerHTML = '<span class="text-green-400">✓ 已配置自定义API密钥</span>';
+        } else {
+            status.innerHTML = '<span class="text-yellow-400">⚠ 使用默认API密钥（可能失效）</span>';
+        }
+    }
+}
+
+function saveTmdbApiKey() {
+    const input = document.getElementById('tmdbApiKeyInput');
+    const status = document.getElementById('tmdbApiStatus');
+    
+    if (!input) return;
+    
+    const apiKey = input.value.trim();
+    if (!apiKey) {
+        showToast('请输入API密钥', 'error');
+        return;
+    }
+    
+    // 简单的API密钥格式验证
+    if (apiKey.length < 20) {
+        showToast('API密钥格式不正确', 'error');
+        return;
+    }
+    
+    localStorage.setItem('tmdbApiKey', apiKey);
+    
+    if (status) {
+        status.innerHTML = '<span class="text-green-400">✓ API密钥已保存</span>';
+    }
+    
+    showToast('TMDB API密钥已保存', 'success');
+}
+
+async function testTmdbApiKey() {
+    const input = document.getElementById('tmdbApiKeyInput');
+    const status = document.getElementById('tmdbApiStatus');
+    
+    if (!input) return;
+    
+    const apiKey = input.value.trim() || localStorage.getItem('tmdbApiKey');
+    if (!apiKey) {
+        showToast('请先输入API密钥', 'error');
+        return;
+    }
+    
+    if (status) {
+        status.innerHTML = '<span class="text-blue-400">🔄 正在测试...</span>';
+    }
+    
+    try {
+        const response = await fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=zh-CN&page=1`);
+        
+        if (response.ok) {
+            if (status) {
+                status.innerHTML = '<span class="text-green-400">✓ API密钥有效</span>';
+            }
+            showToast('API密钥测试成功！', 'success');
+        } else if (response.status === 401) {
+            if (status) {
+                status.innerHTML = '<span class="text-red-400">✗ API密钥无效</span>';
+            }
+            showToast('API密钥无效，请检查并重新输入', 'error');
+        } else {
+            throw new Error(`HTTP ${response.status}`);
+        }
+    } catch (error) {
+        console.error('TMDB API测试失败:', error);
+        if (status) {
+            status.innerHTML = '<span class="text-red-400">✗ 测试失败</span>';
+        }
+        showToast('API测试失败，请检查网络连接', 'error');
+    }
+}
+
+function clearTmdbApiKey() {
+    if (confirm('确定要清除TMDB API密钥吗？这将使用默认密钥（可能失效）。')) {
+        localStorage.removeItem('tmdbApiKey');
+        
+        const input = document.getElementById('tmdbApiKeyInput');
+        const status = document.getElementById('tmdbApiStatus');
+        
+        if (input) input.value = '';
+        if (status) {
+            status.innerHTML = '<span class="text-yellow-400">⚠ 已清除，使用默认密钥</span>';
+        }
+        
+        showToast('TMDB API密钥已清除', 'success');
+    }
+}
+
+function showTmdbApiHelp() {
+    const helpText = `
+TMDB API密钥获取步骤：
+
+1. 访问 https://www.themoviedb.org/
+2. 注册或登录账户
+3. 进入 Settings > API 页面
+4. 申请 API Key (v3 auth)
+5. 复制 API Key 并粘贴到输入框中
+
+API密钥是免费的，用于获取电影和电视剧数据。
+    `.trim();
+    
+    alert(helpText);
+}
+
+// 页面加载时初始化黑名单计数和TMDB API密钥
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        updateBlacklistCount();
+        loadTmdbApiKey();
+    }, 500);
+});

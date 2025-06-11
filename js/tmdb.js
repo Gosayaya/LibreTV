@@ -93,8 +93,14 @@ class TMDBRecommendation {
         }
 
         try {
-            // 使用免费的TMDB API密钥获取热门电影
-            const apiKey = '8c38258d4376469dce970ad5f798d352';
+            // 获取API密钥 - 优先使用localStorage中的自定义密钥
+            let apiKey = localStorage.getItem('tmdbApiKey');
+            if (!apiKey) {
+                // 使用默认密钥，如果失效请在设置中更换
+                // 获取免费API密钥：https://www.themoviedb.org/settings/api
+                apiKey = '3fd2be6f0c70a2a598f084ddfb75487c'; // 临时密钥，请申请自己的
+            }
+            
             let url;
             
             if (this.currentType === 'movie') {
@@ -105,7 +111,13 @@ class TMDBRecommendation {
 
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                if (response.status === 401) {
+                    throw new Error('API密钥无效或已过期，请在设置中更新TMDB API密钥');
+                } else if (response.status === 429) {
+                    throw new Error('请求过于频繁，请稍后重试');
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
             }
 
             const data = await response.json();
