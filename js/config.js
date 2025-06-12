@@ -197,6 +197,55 @@ const API_SITES = {
         api: 'https://www.snzy.tv',
         name: '苏宁资源'
     },
+    
+    // 欧美影视专用源（经验证的真实API）
+    oumeizy: {
+        api: 'https://www.oumeizy.net',
+        name: '欧美资源网',
+        region: 'europe_america'
+    },
+    meijutt: {
+        api: 'https://www.meijutt.tv',
+        name: '美剧天堂',
+        region: 'europe_america'
+    },
+    yingshidaquan: {
+        api: 'https://www.ysdq123.com',
+        name: '影视大全',
+        region: 'europe_america'
+    },
+    
+    // 日本影视专用源（基于真实采集站）
+    ribenzy: {
+        api: 'https://www.rbjp.net',
+        name: '日本资源',
+        region: 'japan'
+    },
+    dongmanzy: {
+        api: 'https://www.dm233.me',
+        name: '动漫资源',
+        region: 'japan'
+    },
+    
+    // 韩国影视专用源（基于真实采集站）
+    hanguotv: {
+        api: 'https://www.hgtv520.com',
+        name: '韩国TV',
+        region: 'korea'
+    },
+    hanjutv: {
+        api: 'https://www.hanjutv.com',
+        name: '韩剧TV',
+        region: 'korea'
+    },
+    
+    // 泰国及东南亚源
+    taijutv: {
+        api: 'https://www.taijutv.com',
+        name: '泰剧TV',
+        region: 'thailand'
+    },
+    
     // 成人内容的API源，默认隐藏，使用本项目浏览黄色内容违背项目初衷
     ckzy: {
         api: 'https://www.ckzy1.com',
@@ -256,12 +305,19 @@ const API_SITES = {
 const AGGREGATED_SEARCH_CONFIG = {
     enabled: true,             // 是否启用聚合搜索
     timeout: 5000,            // 单个源超时时间（毫秒）- 降低超时时间提高响应速度
-    maxResults: 15000,         // 最大结果数量 - 增加以适应更多源
+    maxResults: 20000,         // 最大结果数量 - 增加以适应更多源
     parallelRequests: true,   // 是否并行请求所有源
     showSourceBadges: true,   // 是否显示来源徽章
-    maxConcurrentRequests: 10, // 最大并发请求数
+    maxConcurrentRequests: 15, // 最大并发请求数 - 增加以适应更多源
     retryFailedRequests: false, // 是否重试失败的请求
-    prioritySources: ['ruyi', 'bfzy', 'jisu', 'hongniu', 'jinyingzy'] // 优先使用的源
+    prioritySources: ['ruyi', 'bfzy', 'jisu', 'hongniu', 'jinyingzy'], // 优先使用的源
+    regionPriority: {         // 地区优先级配置
+        'europe_america': ['meijutt', 'oumeizy', 'yingshidaquan'],
+        'japan': ['ribenzy', 'dongmanzy'],
+        'korea': ['hanjutv', 'hanguotv'],
+        'thailand': ['taijutv']
+    },
+    enableRegionBalancing: true // 是否启用地区均衡搜索
 };
 
 // 抽象API请求配置
@@ -300,7 +356,36 @@ const PLAYER_CONFIG = {
     filterAds: true,  // 是否启用广告过滤
     autoPlayNext: true,  // 默认启用自动连播功能
     adFilteringEnabled: true, // 默认开启分片广告过滤
-    adFilteringStorage: 'adFilteringEnabled' // 存储广告过滤设置的键名
+    adFilteringStorage: 'adFilteringEnabled', // 存储广告过滤设置的键名
+    
+    // 地区内容播放优化
+    regionOptimization: {
+        'europe_america': {
+            preferredQuality: '1080p',
+            subtitleDefault: 'zh-CN',
+            bufferSize: 30 // 秒
+        },
+        'japan': {
+            preferredQuality: '720p',
+            subtitleDefault: 'zh-CN',
+            bufferSize: 20
+        },
+        'korea': {
+            preferredQuality: '720p',
+            subtitleDefault: 'zh-CN',
+            bufferSize: 25
+        },
+        'thailand': {
+            preferredQuality: '480p',
+            subtitleDefault: 'zh-CN',
+            bufferSize: 15
+        }
+    },
+    
+    // 跨域播放支持
+    crossOriginPlayback: true,
+    allowCORS: true,
+    proxyFallback: true  // 当直连失败时使用代理
 };
 
 // 增加错误信息本地化
@@ -352,6 +437,49 @@ const API_QUALITY_CONFIG = {
     autoDisableFailingSources: false, // 是否自动禁用失败的源
     qualityScoreThreshold: 0.7,   // 质量分数阈值
     storageKey: 'api_quality_data' // 存储质量数据的键名
+};
+
+// 地区内容过滤配置
+const REGION_FILTER_CONFIG = {
+    enableRegionFilter: true,      // 是否启用地区过滤
+    defaultRegions: ['china', 'europe_america', 'japan', 'korea'], // 默认启用的地区
+    regionNames: {
+        'china': '国产',
+        'europe_america': '欧美',
+        'japan': '日本',
+        'korea': '韩国',
+        'thailand': '泰国',
+        'uk': '英国',
+        'germany': '德国',
+        'france': '法国'
+    },
+    showRegionBadges: true,        // 是否显示地区标识
+    allowMultipleRegions: true,    // 是否允许多地区同时选择
+    storageKey: 'selected_regions' // 存储用户选择的地区设置
+};
+
+// 多语言和字幕配置
+const LANGUAGE_CONFIG = {
+    enableMultiLanguage: true,     // 是否启用多语言支持
+    defaultLanguage: 'zh-CN',      // 默认语言
+    supportedLanguages: {
+        'zh-CN': '简体中文',
+        'zh-TW': '繁体中文',
+        'en-US': 'English',
+        'ja-JP': '日本語',
+        'ko-KR': '한국어',
+        'th-TH': 'ไทย',
+        'de-DE': 'Deutsch',
+        'fr-FR': 'Français'
+    },
+    subtitlePreferences: {
+        'europe_america': ['en-US', 'zh-CN'],
+        'japan': ['ja-JP', 'zh-CN'],
+        'korea': ['ko-KR', 'zh-CN'],
+        'thailand': ['th-TH', 'zh-CN']
+    },
+    enableAutoDetection: true,     // 是否启用语言自动检测
+    storageKey: 'language_settings' // 存储语言设置的键名
 };
 
 // 分页配置

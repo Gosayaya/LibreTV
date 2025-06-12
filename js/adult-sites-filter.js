@@ -62,7 +62,7 @@ class AdultSitesFilter {
     // 敏感关键词列表
     getSensitiveKeywords() {
         return [
-            // 中文敏感词
+            // 中文敏感词（扩展版）
             '伦理片', '福利', '里番动漫', '门事件', '萝莉少女', '制服诱惑', 
             '国产传媒', 'cosplay', '黑丝诱惑', '无码', '日本无码', '有码', 
             '日本有码', 'SWAG', '网红主播', '色情片', '同性片', '福利视频', 
@@ -70,13 +70,35 @@ class AdultSitesFilter {
             '激情', '诱惑', '艳情', '情趣', '性感', '床戏', '露点', '脱衣',
             '比基尼', '丝袜', '内衣', '透视', '挑逗', '调教', '束缚', '变态',
             '猎奇', '重口味', '血腥', '暴力', '恐怖', '惊悚', '悬疑',
-            // 英文敏感词
+            '写真', '美女', '车模', '嫩模', '外围', '援交', '包养', '一夜情',
+            '约炮', '性爱', '做爱', '自慰', '口交', '肛交', '群交', '乱伦',
+            '强奸', '轮奸', '性虐', '偷拍', '走光', '凸点', '春光', '激凸',
+            '人体艺术', '人体摄影', '裸体', '全裸', '半裸', '艳照', '私房照',
+            
+            // 英文敏感词（扩展版）
             'porn', 'sex', 'adult', 'xxx', 'nude', 'naked', 'erotic', 
             'seductive', 'sexy', 'intimate', 'sensual', 'explicit', 
             'mature', 'uncensored', 'av', 'hentai', 'ecchi', 'yaoi', 
             'yuri', 'fetish', 'bdsm', 'amateur', 'milf', 'teen', 
             'barely legal', 'hardcore', 'softcore', 'lingerie', 'bikini',
-            'strip', 'cam', 'webcam', 'live', 'chat', 'dating', 'hookup'
+            'strip', 'cam', 'webcam', 'live', 'chat', 'dating', 'hookup',
+            'threesome', 'gangbang', 'orgy', 'anal', 'oral', 'blowjob',
+            'masturbation', 'orgasm', 'climax', 'cumshot', 'facial',
+            'creampie', 'lesbian', 'gay', 'bisexual', 'transgender',
+            'kinky', 'nasty', 'dirty', 'naughty', 'slutty', 'horny',
+            'voyeur', 'exhibitionist', 'swingers', 'escort', 'prostitute',
+            'brothel', 'redlight', 'playboy', 'penthouse', 'hustler',
+            'playmate', 'centerfold', 'topless', 'bottomless', 'upskirt',
+            'panties', 'bra', 'underwear', 'thong', 'stockings', 'pantyhose',
+            
+            // 常见变体和隐晦表达
+            'p0rn', 's3x', 'pr0n', 'fck', 'f*ck', 'sh*t', 'b*tch',
+            '色情', '黄色', '成人片', '限制片', '伦理', '情色片', '艳片',
+            'AV片', 'H片', 'R级', 'NC-17', 'X级', '18+', '21+',
+            
+            // 平台相关
+            'onlyfans', 'chaturbate', 'myfreecams', 'livejasmin', 'stripchat',
+            'camsoda', 'cam4', 'bongacams', 'flirt4free', 'streamate'
         ];
     }
 
