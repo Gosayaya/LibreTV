@@ -106,55 +106,7 @@ const API_SITES = {
         api: 'https://ikunzyapi.com',
         name: 'iKun资源'
     },
-    // 新增的视频来源
-    kubo: {
-        api: 'https://www.kubo-api.com',
-        name: '酷播资源'
-    },
-    xinlang: {
-        api: 'https://api.xinlangapi.com',
-        name: '新浪资源'
-    },
-    subo: {
-        api: 'https://www.subocaiji.com',
-        name: '速播资源'
-    },
-    taopianhai: {
-        api: 'https://taopianhai.com',
-        name: '淘片海'
-    },
-    haiwaikan: {
-        api: 'https://haiwaikan.com',
-        name: '海外看'
-    },
-    ukuzy: {
-        api: 'https://api.ukuapi.com',
-        name: 'U酷资源'
-    },
-    zxzj: {
-        api: 'https://api.zxzjhd.com',
-        name: '在线之家'
-    },
-    bjm: {
-        api: 'https://cj.bjm3u8.com',
-        name: '八戒M3U8'
-    },
-    kuyun: {
-        api: 'https://caiji.kuyun98.com',
-        name: '酷云资源'
-    },
-    lezhutv: {
-        api: 'https://www.lezhutv.com',
-        name: '乐猪TV'
-    },
-    miaoparty: {
-        api: 'https://caiji.miaoparty3.com',
-        name: '喵派对'
-    },
-    parwix: {
-        api: 'https://api.parwix.com',
-        name: 'parwix资源'
-    },
+    // 已验证有效的视频源
     hongniu: {
         api: 'https://www.hongniuzy2.com',
         name: '红牛资源'
@@ -163,60 +115,89 @@ const API_SITES = {
         api: 'https://jinyingzy.com',
         name: '金鹰资源'
     },
-    // 更多专业视频源
-    okzy: {
-        api: 'https://cj.okzy.tv',
-        name: 'OK资源'
+    feifei: {
+        api: 'https://cj.ffzyapi.com',
+        name: '飞飞资源'
     },
-    doubanzy: {
-        api: 'https://www.dbjfyy.com',
-        name: '豆瓣电影'
+    // 新增经过验证的有效API源
+    mahua: {
+        api: 'https://www.mahuaapi.com',
+        name: '麻花资源'
     },
-    kyzy: {
-        api: 'https://caiji.kyzy123.com',
-        name: '快云资源'
+    subocaiji: {
+        api: 'https://www.subocaiji.com',
+        name: '速播资源'
     },
-    tiankongy: {
-        api: 'https://api.tiankongapi.com',
-        name: '天空资源'
+    kubo: {
+        api: 'https://www.kubo-api.com',
+        name: '酷播资源'
+    },
+    ukuapi: {
+        api: 'https://api.ukuapi.com',
+        name: 'U酷资源'
+    },
+    zxzjhd: {
+        api: 'https://api.zxzjhd.com',
+        name: '在线之家'
+    },
+    shijiapi: {
+        api: 'https://api.shijiapi.com',
+        name: '世纪资源'
     },
     yhzy: {
         api: 'https://api.yhzy.cc',
         name: '影狐资源'
     },
-    lemonsj: {
-        api: 'https://api.lemonsj.com',
-        name: '柠檬资源'
+    tiankongapi: {
+        api: 'https://api.tiankongapi.com',
+        name: '天空资源'
     },
-    mgtv: {
-        api: 'https://api.shijiapi.com',
-        name: '世纪资源'
+    apibdzy: {
+        api: 'https://api.apibdzy.com',
+        name: '百度云资源'
     },
-    myapifilms: {
-        api: 'https://myapifilms.com',
-        name: 'MyAPI影片'
+    dbjfyy: {
+        api: 'https://www.dbjfyy.com',
+        name: '豆瓣电影'
     },
-    ziyuan: {
-        api: 'https://api.ziyuantv.com',
-        name: '资源TV'
+    parwix: {
+        api: 'https://api.parwix.com',
+        name: 'parwix资源'
     },
-    feifei: {
-        api: 'https://cj.ffzyapi.com',
-        name: '飞飞资源'
+    // 其他稳定资源站
+    lezhutv: {
+        api: 'https://www.lezhutv.com',
+        name: '乐猪TV'
     },
-    // testSource: {
-    //     api: 'https://www.example.com',
-    //     name: '空内容测试源',
-    //     adult: true
-    // },
-    // 下面是一些成人内容的API源，默认隐藏，使用本项目浏览黄色内容违背项目初衷
-    // 互联网上传播的色情内容将人彻底客体化、工具化，是性别解放和人类平等道路上的巨大障碍。
-    // 这些黄色影片是资本主义父权制压迫的最恶毒体现，它将暴力和屈辱商品化，践踏人的尊严，对受害者造成无法弥愈的伤害，并毒害社会关系。
-    // 资本为了利润，不惜将最卑劣的剥削（包括对受害者和表演者的剥削）和暴力商品化，
-    // 把性别剥削塑造成“性享受”麻痹观众的意识，转移我们对现实生活中矛盾和压迫的注意力。
-    // 这些影片和背后的产业已经使数百万男女“下海”，出卖自己的身体，甚至以此为生计。
-    // 而作为观众无辜吗？毫无疑问，他们促成了黄色产业链的再生产。
-    // 我们提供此警告，是希望您能认清这些内容的本质——它们是压迫和奴役的工具，而非娱乐。
+    miaoparty: {
+        api: 'https://caiji.miaoparty3.com',
+        name: '喵派对'
+    },
+    kyzy123: {
+        api: 'https://caiji.kyzy123.com',
+        name: '快云资源'
+    },
+    kuyun98: {
+        api: 'https://caiji.kuyun98.com',
+        name: '酷云资源'
+    },
+    bjm3u8: {
+        api: 'https://cj.bjm3u8.com',
+        name: '八戒M3U8'
+    },
+    okzy: {
+        api: 'https://cj.okzy.tv',
+        name: 'OK资源'
+    },
+    xlmlsp: {
+        api: 'https://cj.xlmlsp.com',
+        name: '新浪资源'
+    },
+    snzy: {
+        api: 'https://www.snzy.tv',
+        name: '苏宁资源'
+    },
+    // 成人内容的API源，默认隐藏，使用本项目浏览黄色内容违背项目初衷
     ckzy: {
         api: 'https://www.ckzy1.com',
         name: 'CK资源',
@@ -258,12 +239,7 @@ const API_SITES = {
         name: '玉兔资源',
         adult: true
     },
-    // 新增成人内容API源
-    sese: {
-        api: 'https://sesezy.com',
-        name: '涩涩资源',
-        adult: true
-    },
+    // 成人内容API源（已验证有效的保留）
     caoliu: {
         api: 'https://caoliuzy.com',
         name: '草榴资源',
@@ -273,46 +249,19 @@ const API_SITES = {
         api: 'https://bbzy.tv',
         name: 'BB资源',
         adult: true
-    },
-    qingse: {
-        api: 'https://qingsezy.com',
-        name: '青涩资源',
-        adult: true
-    },
-    jizz: {
-        api: 'https://jizzapi.com',
-        name: 'Jizz资源',
-        adult: true
-    },
-    miya: {
-        api: 'https://miyaapi.com',
-        name: '蜜芽资源',
-        adult: true
-    },
-    papa: {
-        api: 'https://papaapi.com',
-        name: 'Papa资源',
-        adult: true
-    },
-    mgstage: {
-        api: 'https://mgstageapi.com',
-        name: 'MGStage资源',
-        adult: true
-    },
-    jav: {
-        api: 'https://javapi.com',
-        name: 'JAV资源',
-        adult: true
     }
 };
 
 // 添加聚合搜索的配置选项
 const AGGREGATED_SEARCH_CONFIG = {
     enabled: true,             // 是否启用聚合搜索
-    timeout: 8000,            // 单个源超时时间（毫秒）
-    maxResults: 10000,          // 最大结果数量
+    timeout: 5000,            // 单个源超时时间（毫秒）- 降低超时时间提高响应速度
+    maxResults: 15000,         // 最大结果数量 - 增加以适应更多源
     parallelRequests: true,   // 是否并行请求所有源
-    showSourceBadges: true    // 是否显示来源徽章
+    showSourceBadges: true,   // 是否显示来源徽章
+    maxConcurrentRequests: 10, // 最大并发请求数
+    retryFailedRequests: false, // 是否重试失败的请求
+    prioritySources: ['ruyi', 'bfzy', 'jisu', 'hongniu', 'jinyingzy'] // 优先使用的源
 };
 
 // 抽象API请求配置
@@ -392,6 +341,17 @@ const ADULT_CONTENT_CONFIG = {
     requireAgeVerification: false, // 是否需要年龄验证
     adultContentWarning: false,    // 是否显示成人内容警告
     separateAdultSources: true     // 是否单独显示成人内容源
+};
+
+// API源质量监控配置
+const API_QUALITY_CONFIG = {
+    enableMonitoring: true,        // 是否启用质量监控
+    monitoringInterval: 300000,    // 监控间隔（5分钟）
+    maxFailureRate: 0.3,          // 最大失败率（30%）
+    minResponseTime: 2000,        // 最小响应时间（2秒）
+    autoDisableFailingSources: false, // 是否自动禁用失败的源
+    qualityScoreThreshold: 0.7,   // 质量分数阈值
+    storageKey: 'api_quality_data' // 存储质量数据的键名
 };
 
 // 分页配置
