@@ -258,6 +258,52 @@ const API_SITES = {
         name: '玉兔资源',
         adult: true
     },
+    // 新增成人内容API源
+    sese: {
+        api: 'https://sesezy.com',
+        name: '涩涩资源',
+        adult: true
+    },
+    caoliu: {
+        api: 'https://caoliuzy.com',
+        name: '草榴资源',
+        adult: true
+    },
+    bbzy: {
+        api: 'https://bbzy.tv',
+        name: 'BB资源',
+        adult: true
+    },
+    qingse: {
+        api: 'https://qingsezy.com',
+        name: '青涩资源',
+        adult: true
+    },
+    jizz: {
+        api: 'https://jizzapi.com',
+        name: 'Jizz资源',
+        adult: true
+    },
+    miya: {
+        api: 'https://miyaapi.com',
+        name: '蜜芽资源',
+        adult: true
+    },
+    papa: {
+        api: 'https://papaapi.com',
+        name: 'Papa资源',
+        adult: true
+    },
+    mgstage: {
+        api: 'https://mgstageapi.com',
+        name: 'MGStage资源',
+        adult: true
+    },
+    jav: {
+        api: 'https://javapi.com',
+        name: 'JAV资源',
+        adult: true
+    }
 };
 
 // 添加聚合搜索的配置选项
@@ -339,6 +385,14 @@ const CUSTOM_API_CONFIG = {
 
 // 隐藏内置黄色采集站API的变量
 const HIDE_BUILTIN_ADULT_APIS = false;
+
+// 成人内容显示配置
+const ADULT_CONTENT_CONFIG = {
+    showAdultApis: true,           // 是否显示成人内容API源
+    requireAgeVerification: false, // 是否需要年龄验证
+    adultContentWarning: false,    // 是否显示成人内容警告
+    separateAdultSources: true     // 是否单独显示成人内容源
+};
 
 // 分页配置
 const PAGINATION_CONFIG = {
