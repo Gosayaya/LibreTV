@@ -508,3 +508,539 @@ const PAGINATION_CONFIG = {
     scrollToTop: true,              // 翻页时是否滚动到顶部
     storageKey: 'pagination_settings' // 存储分页设置的键名
 };
+
+// IMDB推荐配置
+const IMDB_CONFIG = {
+    enabled: true,
+    apiKeys: ['trilogy', 'b9a57b81', '2c6d98b', 'ff15bdef'], // OMDB API密钥
+    baseUrl: 'https://www.omdbapi.com/',
+    timeout: 8000,
+    maxRetries: 3,
+    cacheExpiry: 3600000, // 1小时缓存
+    fallbackEnabled: true,
+    
+    // 播放源映射 - 将IMDB内容映射到本地API源
+    sourceMapping: {
+        // 优先使用的播放源（按优先级排序）
+        priority: ['ruyi', 'bfzy', 'jisu', 'hongniu', 'jinyingzy', 'feifei'],
+        // 地区特定映射
+        regionMapping: {
+            'US': ['meijutt', 'oumeizy', 'yingshidaquan'],
+            'UK': ['meijutt', 'oumeizy'],
+            'CA': ['meijutt', 'oumeizy'],
+            'AU': ['meijutt', 'oumeizy']
+        }
+    },
+    
+    // 搜索优化
+    searchOptimization: {
+        enableYearFilter: true,        // 启用年份过滤
+        enableGenreMapping: true,      // 启用类型映射
+        titleNormalization: true,      // 标题标准化
+        removeSpecialChars: true,      // 移除特殊字符
+        maxSearchAttempts: 3           // 最大搜索尝试次数
+    },
+    
+    storageKey: 'imdb_settings'
+};
+
+// TMDB推荐配置
+const TMDB_CONFIG = {
+    enabled: true,
+    apiKey: '3fd2be6f0c70a2a598f084ddfb75487c', // 默认API密钥
+    baseUrl: 'https://api.themoviedb.org/3/',
+    imageBaseUrl: 'https://image.tmdb.org/t/p/',
+    timeout: 10000,
+    language: 'zh-CN',
+    region: 'CN',
+    
+    // 播放源映射
+    sourceMapping: {
+        // 优先使用的播放源
+        priority: ['ruyi', 'bfzy', 'jisu', 'hongniu', 'jinyingzy', 'mahua'],
+        // 内容类型映射
+        contentTypeMapping: {
+            'movie': ['ruyi', 'bfzy', 'jisu', 'hongniu'],
+            'tv': ['ruyi', 'bfzy', 'jinyingzy', 'mahua']
+        },
+        // 地区映射
+        regionMapping: {
+            'US': ['meijutt', 'oumeizy', 'yingshidaquan'],
+            'GB': ['meijutt', 'oumeizy'],
+            'JP': ['ribenzy', 'dongmanzy'],
+            'KR': ['hanjutv', 'hanguotv'],
+            'TH': ['taijutv']
+        }
+    },
+    
+    // 搜索优化
+    searchOptimization: {
+        enableOriginalTitle: true,     // 使用原始标题搜索
+        enableTranslatedTitle: true,   // 使用翻译标题搜索
+        enableReleaseYear: true,       // 包含发行年份
+        titleVariations: true,         // 尝试标题变体
+        maxSearchAttempts: 4
+    },
+    
+    // 图片配置
+    imageConfig: {
+        posterSizes: ['w300', 'w500', 'w780', 'original'],
+        backdropSizes: ['w300', 'w780', 'w1280', 'original'],
+        defaultPosterSize: 'w300',
+        defaultBackdropSize: 'w780'
+    },
+    
+    storageKey: 'tmdb_settings'
+};
+
+// TVMaze推荐配置
+const TVMAZE_CONFIG = {
+    enabled: true,
+    baseUrl: 'https://api.tvmaze.com/',
+    timeout: 8000,
+    maxRetries: 2,
+    
+    // 播放源映射
+    sourceMapping: {
+        // 优先使用的播放源（电视剧专用）
+        priority: ['ruyi', 'bfzy', 'jinyingzy', 'mahua', 'jisu'],
+        // 网络映射
+        networkMapping: {
+            'Netflix': ['ruyi', 'bfzy', 'jinyingzy'],
+            'HBO': ['ruyi', 'bfzy', 'mahua'],
+            'Amazon Prime Video': ['ruyi', 'jinyingzy'],
+            'Hulu': ['bfzy', 'jinyingzy'],
+            'Disney+': ['ruyi', 'mahua'],
+            'Apple TV+': ['ruyi', 'bfzy']
+        },
+        // 地区映射
+        regionMapping: {
+            'US': ['meijutt', 'oumeizy', 'yingshidaquan'],
+            'UK': ['meijutt', 'oumeizy'],
+            'JP': ['ribenzy', 'dongmanzy'],
+            'KR': ['hanjutv', 'hanguotv']
+        }
+    },
+    
+    // 搜索优化
+    searchOptimization: {
+        enableNetworkInfo: true,       // 包含网络信息
+        enableGenreMapping: true,      // 类型映射
+        enableSeasonEpisode: true,     // 季集信息
+        titleNormalization: true,      // 标题标准化
+        maxSearchAttempts: 3
+    },
+    
+    // 分类配置
+    categories: {
+        'popular': '热门剧集',
+        'today': '今日播出',
+        'schedule': '播出时间表',
+        'premieres': '首播剧集'
+    },
+    
+    storageKey: 'tvmaze_settings'
+};
+
+// 推荐服务统一配置
+const RECOMMENDATION_CONFIG = {
+    // 全局设置
+    globalSettings: {
+        enableRecommendations: true,
+        autoSearchPlaySources: true,    // 自动搜索播放源
+        showSourceIndicators: true,     // 显示播放源指示器
+        enableCaching: true,           // 启用缓存
+        cacheExpiry: 1800000,         // 30分钟缓存
+        maxConcurrentSearches: 5,     // 最大并发搜索数
+        searchTimeout: 15000          // 搜索超时时间
+    },
+    
+    // 播放源优先级（全局）
+    globalSourcePriority: [
+        'ruyi', 'bfzy', 'jisu', 'hongniu', 'jinyingzy', 'feifei', 'mahua',
+        'subocaiji', 'kubo', 'ukuapi', 'zxzjhd', 'shijiapi', 'yhzy'
+    ],
+    
+    // 搜索策略
+    searchStrategy: {
+        // 标题处理策略
+        titleProcessing: {
+            removeYear: true,           // 移除年份
+            removeSpecialChars: true,   // 移除特殊字符
+            normalizeSpaces: true,      // 标准化空格
+            tryOriginalTitle: true,     // 尝试原始标题
+            tryTranslatedTitle: true,   // 尝试翻译标题
+            tryShortTitle: true         // 尝试简短标题
+        },
+        
+        // 搜索顺序
+        searchOrder: [
+            'exact_match',              // 精确匹配
+            'fuzzy_match',             // 模糊匹配
+            'partial_match',           // 部分匹配
+            'alternative_title'        // 备选标题
+        ],
+        
+        // 结果过滤
+        resultFiltering: {
+            minQualityScore: 0.6,      // 最小质量分数
+            preferHigherResolution: true, // 优先高分辨率
+            filterDuplicates: true,    // 过滤重复结果
+            maxResultsPerSource: 10    // 每个源最大结果数
+        }
+    },
+    
+    // 用户界面配置
+    uiConfig: {
+        showLoadingIndicators: true,   // 显示加载指示器
+        showSearchProgress: true,      // 显示搜索进度
+        enableQuickPlay: true,         // 启用快速播放
+        showSourceBadges: true,        // 显示来源标识
+        enablePreview: false,          // 启用预览功能
+        animationDuration: 300         // 动画持续时间
+    },
+    
+    storageKey: 'recommendation_global_settings'
+};
+
+// 播放源质量评估配置
+const SOURCE_QUALITY_CONFIG = {
+    // 质量指标权重
+    qualityWeights: {
+        responseTime: 0.3,     // 响应时间权重
+        successRate: 0.4,      // 成功率权重
+        videoQuality: 0.2,     // 视频质量权重
+        stability: 0.1         // 稳定性权重
+    },
+    
+    // 质量阈值
+    qualityThresholds: {
+        excellent: 0.9,        // 优秀
+        good: 0.7,            // 良好
+        fair: 0.5,            // 一般
+        poor: 0.3             // 较差
+    },
+    
+    // 自动优化
+    autoOptimization: {
+        enabled: true,
+        reorderSources: true,  // 重新排序播放源
+        disablePoorSources: false, // 禁用质量差的源
+        updateInterval: 86400000   // 24小时更新间隔
+    },
+    
+    storageKey: 'source_quality_data'
+};
+
+// 标题匹配和播放源查找配置
+const TITLE_MATCHING_CONFIG = {
+    // 标题转换规则
+    titleTransformation: {
+        // 英文标题到中文标题的映射规则
+        englishToChinese: {
+            // 常见电影标题映射
+            'The Shawshank Redemption': '肖申克的救赎',
+            'The Godfather': '教父',
+            'The Dark Knight': '蝙蝠侠：黑暗骑士',
+            'Forrest Gump': '阿甘正传',
+            'Inception': '盗梦空间',
+            'The Matrix': '黑客帝国',
+            'Pulp Fiction': '低俗小说',
+            'Fight Club': '搏击俱乐部',
+            'Goodfellas': '好家伙',
+            'The Lord of the Rings': '指环王',
+            'Star Wars': '星球大战',
+            'The Avengers': '复仇者联盟',
+            'Titanic': '泰坦尼克号',
+            'Avatar': '阿凡达',
+            'Interstellar': '星际穿越',
+            'The Departed': '无间道风云',
+            'The Prestige': '致命魔术',
+            'Gladiator': '角斗士',
+            'The Lion King': '狮子王',
+            'Saving Private Ryan': '拯救大兵瑞恩',
+            'Jurassic Park': '侏罗纪公园',
+            'Terminator': '终结者',
+            'Back to the Future': '回到未来',
+            'Casino': '赌城风云',
+            'Heat': '盗火线',
+            'Se7en': '七宗罪',
+            'The Silence of the Lambs': '沉默的羔羊',
+            'Alien': '异形',
+            'Blade Runner': '银翼杀手',
+            'The Shining': '闪灵',
+            'Psycho': '惊魂记',
+            'Vertigo': '迷魂记',
+            'Citizen Kane': '公民凯恩',
+            'Gone Girl': '消失的爱人',
+            'Zodiac': '十二宫',
+            'Mad Max Fury Road': '疯狂的麦克斯：狂暴之路',
+            'John Wick': '疾速追杀',
+            'Deadpool': '死侍',
+            'Iron Man': '钢铁侠',
+            'Spider-Man': '蜘蛛侠',
+            
+            // 常见电视剧标题映射
+            'Breaking Bad': '绝命毒师',
+            'Game of Thrones': '权力的游戏',
+            'The Sopranos': '黑道家族',
+            'Friends': '老友记',
+            'The Office': '办公室',
+            'Stranger Things': '怪奇物语',
+            'The Crown': '王冠',
+            'House of Cards': '纸牌屋',
+            'Sherlock': '神探夏洛克',
+            'True Detective': '真探',
+            'The Walking Dead': '行尸走肉',
+            'Lost': '迷失',
+            'Prison Break': '越狱',
+            'Dexter': '嗜血法医',
+            'House': '豪斯医生',
+            'How I Met Your Mother': '老爸老妈浪漫史',
+            'The Big Bang Theory': '生活大爆炸',
+            'Westworld': '西部世界',
+            'Black Mirror': '黑镜',
+            'Fargo': '冰血暴',
+            'Better Call Saul': '风骚律师',
+            'Vikings': '维京传奇',
+            'The Mandalorian': '曼达洛人',
+            'Narcos': '毒枭',
+            'Ozark': '奥扎克',
+            'Succession': '继承之战',
+            'The Witcher': '猎魔人',
+            'Money Heist': '纸钞屋',
+            'Dark': '暗黑'
+        },
+        
+        // 标题清理规则
+        cleaningRules: {
+            // 移除的前缀
+            removePrefixes: ['The ', 'A ', 'An '],
+            // 移除的后缀
+            removeSuffixes: [' (TV Series)', ' (Movie)', ' (Film)'],
+            // 移除的特殊字符
+            removeSpecialChars: [':', '?', '!', '-', '–', '—', '(', ')', '[', ']', '{', '}'],
+            // 替换规则
+            replacements: {
+                '&': 'and',
+                '@': 'at',
+                '#': 'number',
+                '$': 'dollar'
+            }
+        },
+        
+        // 年份处理
+        yearHandling: {
+            removeFromTitle: true,      // 从标题中移除年份
+            useForFiltering: true,      // 使用年份过滤结果
+            yearTolerance: 2            // 年份容差（±2年）
+        }
+    },
+    
+    // 搜索策略配置
+    searchStrategies: [
+        {
+            name: 'exact_chinese_match',
+            description: '精确中文匹配',
+            enabled: true,
+            priority: 1,
+            method: 'exact',
+            useTranslation: true
+        },
+        {
+            name: 'exact_english_match',
+            description: '精确英文匹配',
+            enabled: true,
+            priority: 2,
+            method: 'exact',
+            useTranslation: false
+        },
+        {
+            name: 'fuzzy_chinese_match',
+            description: '模糊中文匹配',
+            enabled: true,
+            priority: 3,
+            method: 'fuzzy',
+            useTranslation: true,
+            threshold: 0.8
+        },
+        {
+            name: 'partial_match',
+            description: '部分匹配',
+            enabled: true,
+            priority: 4,
+            method: 'partial',
+            minLength: 3
+        },
+        {
+            name: 'keyword_match',
+            description: '关键词匹配',
+            enabled: true,
+            priority: 5,
+            method: 'keywords',
+            minKeywords: 2
+        }
+    ],
+    
+    // 结果评分配置
+    scoringConfig: {
+        // 评分权重
+        weights: {
+            titleSimilarity: 0.4,      // 标题相似度
+            yearMatch: 0.2,            // 年份匹配
+            sourceQuality: 0.2,        // 播放源质量
+            completeness: 0.1,         // 信息完整度
+            popularity: 0.1            // 热门程度
+        },
+        
+        // 最小分数阈值
+        minScore: 0.6,
+        
+        // 最大返回结果数
+        maxResults: 10
+    }
+};
+
+// 播放源匹配增强配置
+const SOURCE_MATCHING_CONFIG = {
+    // 匹配策略
+    matchingStrategies: {
+        // 启用多源并行搜索
+        parallelSearch: true,
+        
+        // 搜索超时时间（毫秒）
+        searchTimeout: 12000,
+        
+        // 最大并发搜索数
+        maxConcurrentSearches: 8,
+        
+        // 重试配置
+        retryConfig: {
+            enabled: true,
+            maxRetries: 2,
+            retryDelay: 1000
+        }
+    },
+    
+    // 播放源优先级（针对国外内容）
+    foreignContentSources: {
+        // 欧美内容优先源
+        western: [
+            'ruyi', 'bfzy', 'jisu', 'hongniu', 'jinyingzy', 'feifei',
+            'mahua', 'subocaiji', 'kubo', 'ukuapi', 'meijutt', 'oumeizy'
+        ],
+        
+        // 日韩内容优先源
+        asian: [
+            'ruyi', 'bfzy', 'jinyingzy', 'mahua', 'ribenzy', 'dongmanzy',
+            'hanjutv', 'hanguotv', 'jisu', 'hongniu'
+        ],
+        
+        // 通用备选源
+        fallback: [
+            'zxzjhd', 'shijiapi', 'yhzy', 'tiankongapi', 'apibdzy',
+            'dbjfyy', 'parwix', 'lezhutv', 'miaoparty'
+        ]
+    },
+    
+    // 内容类型映射
+    contentTypeMapping: {
+        'movie': {
+            keywords: ['电影', '影片', '片'],
+            preferredSources: ['ruyi', 'bfzy', 'jisu', 'hongniu']
+        },
+        'tv': {
+            keywords: ['电视剧', '剧集', '连续剧', '美剧', '韩剧', '日剧'],
+            preferredSources: ['ruyi', 'bfzy', 'jinyingzy', 'mahua']
+        },
+        'anime': {
+            keywords: ['动漫', '动画', '番剧'],
+            preferredSources: ['ribenzy', 'dongmanzy', 'ruyi', 'bfzy']
+        }
+    },
+    
+    // 结果过滤配置
+    resultFiltering: {
+        // 过滤低质量结果
+        filterLowQuality: true,
+        
+        // 最小标题相似度
+        minTitleSimilarity: 0.5,
+        
+        // 去重配置
+        deduplication: {
+            enabled: true,
+            similarityThreshold: 0.9
+        },
+        
+        // 年份过滤
+        yearFiltering: {
+            enabled: true,
+            tolerance: 3  // ±3年
+        }
+    }
+};
+
+// 智能搜索增强配置
+const SMART_SEARCH_CONFIG = {
+    // 搜索增强功能
+    enhancements: {
+        // 自动标题翻译
+        autoTranslation: {
+            enabled: true,
+            services: ['builtin', 'fallback'],  // 内置翻译 + 备选方案
+            cacheResults: true,
+            cacheExpiry: 2592000000  // 30天缓存
+        },
+        
+        // 智能关键词提取
+        keywordExtraction: {
+            enabled: true,
+            minKeywordLength: 2,
+            maxKeywords: 5,
+            excludeCommonWords: true
+        },
+        
+        // 相似度计算
+        similarityCalculation: {
+            algorithm: 'levenshtein',  // 编辑距离算法
+            threshold: 0.6,
+            caseSensitive: false
+        }
+    },
+    
+    // 搜索优化
+    optimization: {
+        // 缓存搜索结果
+        cacheResults: true,
+        cacheDuration: 1800000,  // 30分钟
+        
+        // 预加载热门内容
+        preloadPopular: true,
+        
+        // 搜索建议
+        searchSuggestions: {
+            enabled: true,
+            maxSuggestions: 5,
+            includeAlternativeTitles: true
+        }
+    },
+    
+    // 失败处理
+    failureHandling: {
+        // 无结果时的备选策略
+        fallbackStrategies: [
+            'try_alternative_titles',
+            'try_partial_match',
+            'try_keyword_search',
+            'try_similar_content'
+        ],
+        
+        // 错误重试
+        retryOnError: true,
+        maxRetries: 2,
+        
+        // 用户提示
+        showSuggestions: true
+    }
+};

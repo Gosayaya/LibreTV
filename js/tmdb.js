@@ -158,7 +158,8 @@ class TMDBRecommendation {
             const overview = movie.overview || '暂无简介';
 
             return `
-                <div class="movie-card bg-[#111] rounded-lg overflow-hidden hover:bg-[#222] transition-colors cursor-pointer">
+                <div class="movie-card bg-[#111] rounded-lg overflow-hidden hover:bg-[#222] transition-colors cursor-pointer"
+                     onclick="searchAndPlayFromTMDB('${title.replace(/'/g, "\\'")}', '${year}')">
                     <div class="aspect-[2/3] relative overflow-hidden bg-gray-800">
                         <img src="${poster}" 
                              alt="${title}" 
@@ -168,8 +169,8 @@ class TMDBRecommendation {
                         <div class="absolute top-2 left-2 bg-black bg-opacity-75 text-blue-400 text-xs px-2 py-1 rounded">
                             ⭐ ${rating}
                         </div>
-                        <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
-                            ${year}
+                        <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-green-400 text-xs px-2 py-1 rounded" title="点击搜索播放源">
+                            🎬
                         </div>
                     </div>
                     <div class="p-3">
@@ -180,6 +181,9 @@ class TMDBRecommendation {
                         <p class="text-gray-500 text-xs line-clamp-2" title="${overview}">
                             ${overview.substring(0, 100)}${overview.length > 100 ? '...' : ''}
                         </p>
+                        <div class="mt-2 text-center">
+                            <span class="text-xs text-gray-500">点击搜索播放源</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -305,4 +309,39 @@ if (document.readyState === 'loading') {
         initTMDB();
         initTMDBSettings();
     }, 50);
+}
+
+// 从TMDB推荐搜索播放源并播放
+async function searchAndPlayFromTMDB(title, year) {
+    if (!title) return;
+    
+    // 安全处理标题，防止XSS
+    const safeTitle = title
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    
+    // 填充搜索框
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.value = safeTitle;
+    }
+    
+    // 显示加载提示
+    showToast(`正在搜索《${safeTitle}》的播放源...`, 'info');
+    
+    try {
+        // 执行搜索
+        await search();
+        
+        // 滚动到搜索结果区域
+        const resultsArea = document.getElementById('resultsArea');
+        if (resultsArea && !resultsArea.classList.contains('hidden')) {
+            resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+    } catch (error) {
+        console.error('搜索播放源失败:', error);
+        showToast('搜索播放源失败，请稍后重试', 'error');
+    }
 }

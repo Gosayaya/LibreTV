@@ -362,7 +362,7 @@ class IMDBRecommendation {
         
         container.innerHTML = movies.map((movie, index) => `
             <div class="movie-card bg-[#111] rounded-lg overflow-hidden hover:bg-[#222] transition-colors cursor-pointer" 
-                 onclick="showMovieDetails('${movie.imdbID}', '${movie.title.replace(/'/g, "\\'")}')">
+                 onclick="searchAndPlayFromIMDB('${movie.title.replace(/'/g, "\\'")}', '${movie.year}')">
                 <div class="aspect-[2/3] relative overflow-hidden bg-gray-800">
                     <img id="imdb-img-${index}" 
                          src="${movie.poster}" 
@@ -374,6 +374,10 @@ class IMDBRecommendation {
                          loading="lazy">
                     <div class="absolute top-2 left-2 bg-black bg-opacity-75 text-yellow-400 text-xs px-2 py-1 rounded">
                         ⭐ ${movie.rating}
+                    </div>
+                    <!-- 播放源状态指示器 -->
+                    <div class="absolute top-2 right-2 bg-black bg-opacity-75 text-green-400 text-xs px-2 py-1 rounded" title="点击搜索播放源">
+                        🎬
                     </div>
                     <!-- 加载占位符 -->
                     <div class="absolute inset-0 flex items-center justify-center bg-gray-800 text-gray-400" id="placeholder-${index}">
@@ -391,6 +395,14 @@ class IMDBRecommendation {
                     <p class="text-gray-500 text-xs line-clamp-2" title="${movie.plot}">
                         ${movie.plot}
                     </p>
+                    <!-- 添加搜索播放源按钮 -->
+                    <div class="mt-2 flex justify-between items-center">
+                        <button onclick="event.stopPropagation(); showMovieDetails('${movie.imdbID}', '${movie.title.replace(/'/g, "\\'")}')" 
+                                class="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded" title="查看详情">
+                            详情
+                        </button>
+                        <span class="text-xs text-gray-500">点击搜索播放</span>
+                    </div>
                 </div>
             </div>
         `).join('');
@@ -986,4 +998,39 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         initIMDB();
     }, 100);
-}); 
+});
+
+// 从IMDB推荐搜索播放源并播放
+async function searchAndPlayFromIMDB(title, year) {
+    if (!title) return;
+    
+    // 安全处理标题，防止XSS
+    const safeTitle = title
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    
+    // 填充搜索框
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.value = safeTitle;
+    }
+    
+    // 显示加载提示
+    showToast(`正在搜索《${safeTitle}》的播放源...`, 'info');
+    
+    try {
+        // 执行搜索
+        await search();
+        
+        // 滚动到搜索结果区域
+        const resultsArea = document.getElementById('resultsArea');
+        if (resultsArea && !resultsArea.classList.contains('hidden')) {
+            resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        
+    } catch (error) {
+        console.error('搜索播放源失败:', error);
+        showToast('搜索播放源失败，请稍后重试', 'error');
+    }
+} 
