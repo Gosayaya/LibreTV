@@ -358,6 +358,23 @@ const PLAYER_CONFIG = {
     adFilteringEnabled: true, // 默认开启分片广告过滤
     adFilteringStorage: 'adFilteringEnabled', // 存储广告过滤设置的键名
     
+    // 分辨率切换配置
+    qualityControl: {
+        enabled: true,
+        default: 'auto',  // 默认画质
+        options: [
+            { value: 'auto', label: '自动', bitrate: -1 },
+            { value: '1080', label: '1080P', bitrate: 8000000 },
+            { value: '720', label: '720P', bitrate: 4000000 },
+            { value: '480', label: '480P', bitrate: 2000000 },
+            { value: '360', label: '360P', bitrate: 1000000 }
+        ],
+        storageKey: 'preferred_quality',  // 存储用户选择的键名
+        autoDowngrade: true,  // 网络不佳时自动降级
+        showBitrate: true,    // 是否显示码率信息
+        adaptiveBitrate: true // 是否启用自适应码率
+    },
+    
     // 地区内容播放优化
     regionOptimization: {
         'europe_america': {

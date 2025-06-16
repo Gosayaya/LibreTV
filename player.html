@@ -175,6 +175,39 @@
             .player-container .flex-wrap {
                 margin-bottom: 4px;
             }
+            
+            /* 移动端画质选择器优化 */
+            #qualitySelector {
+                min-width: 80px;
+                font-size: 12px;
+            }
+            
+            /* 移动端左侧控制组可以换行 */
+            .player-container .flex-wrap .flex-wrap {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1px;
+            }
+        }
+        
+        /* 画质选择器样式优化 */
+        #qualitySelector {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1rem 1rem;
+            padding-right: 2rem;
+        }
+        
+        #qualitySelector:hover {
+            border-color: #60a5fa;
+        }
+        
+        #qualitySelector:focus {
+            outline: none;
+            border-color: #00ccff;
+            box-shadow: 0 0 0 1px #00ccff;
         }
     </style>
 </head>
@@ -252,19 +285,34 @@
             </div>
         </div>
 
-        <!-- 添加自动播放开关和排序按钮 -->
+                        <!-- 添加自动播放开关和排序按钮 -->
         <div class="player-container mb-2">
-            <div class="flex flex-wrap justify-end items-center gap-2">
-                <!-- 自动连播开关 - 分组到左边 -->
-                <div class="flex items-center gap-1 flex-shrink-0 mr-auto">
-                    <span class="text-gray-400 text-sm whitespace-nowrap">自动连播</span>
-                    <label class="switch">
-                        <input type="checkbox" id="autoplayToggle">
-                        <span class="slider"></span>
-                    </label>
+            <div class="flex flex-wrap justify-between items-center gap-2">
+                <!-- 左侧控制组 -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <!-- 自动连播开关 -->
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <span class="text-gray-400 text-sm whitespace-nowrap">自动连播</span>
+                        <label class="switch">
+                            <input type="checkbox" id="autoplayToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <!-- 分辨率选择器 -->
+                    <div class="flex items-center gap-1 flex-shrink-0">
+                        <span class="text-gray-400 text-sm whitespace-nowrap">画质</span>
+                        <select id="qualitySelector" class="px-2 py-1 bg-[#222] hover:bg-[#333] border border-[#333] text-white rounded-lg transition text-sm">
+                            <option value="auto">自动</option>
+                            <option value="1080">1080P</option>
+                            <option value="720">720P</option>
+                            <option value="480">480P</option>
+                            <option value="360">360P</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <!-- 把各种功能按钮放在右侧 - 在小屏幕上各自占一行 -->
+                <!-- 右侧功能按钮组 -->
                 <div class="flex flex-wrap justify-end gap-2">
                     <!-- 倒序排列按钮 -->
                     <button onclick="toggleEpisodeOrder()" class="px-3 py-1 bg-[#222] hover:bg-[#333] border border-[#333] rounded-lg transition-colors flex items-center space-x-1 flex-shrink-0">
@@ -328,6 +376,10 @@
                 </div>
                 
                 <div class="text-center md:text-right">
+                    <div class="mb-2 text-xs text-gray-600">
+                        <p class="mb-1">🎮 快捷键：Alt+← 上一集 | Alt+→ 下一集 | Q 切换画质 | 1-5 选择画质</p>
+                        <p>📱 移动端：长按视频3倍速播放</p>
+                    </div>
                     <p class="text-gray-500 text-sm max-w-md">
                         免责声明：本站仅为视频搜索工具，不存储、上传或分发任何视频内容。
                         所有视频均来自第三方API接口。如有侵权，请联系相关内容提供方。
@@ -381,6 +433,9 @@
         let shortcutHintTimeout = null; // 用于控制快捷键提示显示时间
         let adFilteringEnabled = true; // 默认开启广告过滤
         let progressSaveInterval = null; // 定期保存进度的计时器
+        let currentQuality = 'auto'; // 当前选择的画质
+        let availableQualities = []; // 可用的画质列表
+        let qualityLevels = []; // HLS质量级别
 
         // 页面加载
         document.addEventListener('DOMContentLoaded', function() {
@@ -422,10 +477,20 @@
             // 获取广告过滤设置
             adFilteringEnabled = localStorage.getItem(PLAYER_CONFIG.adFilteringStorage) !== 'false'; // 默认为true
             
+            // 获取画质设置
+            currentQuality = localStorage.getItem(PLAYER_CONFIG.qualityControl.storageKey) || PLAYER_CONFIG.qualityControl.default;
+            document.getElementById('qualitySelector').value = currentQuality;
+            
             // 监听自动连播开关变化
             document.getElementById('autoplayToggle').addEventListener('change', function(e) {
                 autoplayEnabled = e.target.checked;
                 localStorage.setItem('autoplayEnabled', autoplayEnabled);
+            });
+            
+            // 监听画质选择器变化
+            document.getElementById('qualitySelector').addEventListener('change', function(e) {
+                const newQuality = e.target.value;
+                changeVideoQuality(newQuality);
             });
             
             // 优先使用URL传递的集数信息，否则从localStorage获取
@@ -547,7 +612,7 @@
         // 处理键盘快捷键
         function handleKeyboardShortcuts(e) {
             // 忽略输入框中的按键事件
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
 
             // Alt + 左箭头 = 上一集
             if (e.altKey && e.key === 'ArrowLeft') {
@@ -563,6 +628,28 @@
                 if (currentEpisodeIndex < currentEpisodes.length - 1) {
                     playNextEpisode();
                     showShortcutHint('下一集', 'right');
+                    e.preventDefault();
+                }
+            }
+            
+            // Q键 = 切换画质
+            if (e.key === 'q' || e.key === 'Q') {
+                cycleVideoQuality();
+                e.preventDefault();
+            }
+            
+            // 数字键1-5 = 直接切换到对应画质
+            if (e.key >= '1' && e.key <= '5') {
+                const qualityMap = {
+                    '1': 'auto',
+                    '2': '1080',
+                    '3': '720',
+                    '4': '480',
+                    '5': '360'
+                };
+                const targetQuality = qualityMap[e.key];
+                if (targetQuality) {
+                    changeVideoQuality(targetQuality);
                     e.preventDefault();
                 }
             }
@@ -710,9 +797,21 @@
                             video.disableRemotePlayback = false;
                             
                             hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                                // 获取可用的画质级别
+                                updateAvailableQualities(hls);
+                                
+                                // 根据用户选择设置初始画质
+                                setInitialQuality(hls);
+                                
                                 video.play().catch(e => {
                                     console.warn('自动播放被阻止:', e);
                                 });
+                            });
+                            
+                            // 监听画质级别变化
+                            hls.on(Hls.Events.LEVEL_SWITCHED, function(event, data) {
+                                console.log('画质切换到:', data.level);
+                                updateQualitySelector(data.level);
                             });
                             
                             hls.on(Hls.Events.ERROR, function(event, data) {
@@ -1586,6 +1685,212 @@
         function getVideoId() {
             // 使用视频标题和集数索引作为唯一标识
             return `${encodeURIComponent(currentVideoTitle)}_${currentEpisodeIndex}`;
+        }
+
+        // ========================
+        // 画质切换相关函数
+        // ========================
+        
+        // 更新可用画质列表
+        function updateAvailableQualities(hls) {
+            if (!hls || !hls.levels) return;
+            
+            qualityLevels = hls.levels;
+            availableQualities = [];
+            
+            // 总是添加自动选项
+            availableQualities.push({ value: 'auto', label: '自动', level: -1 });
+            
+            // 添加可用的画质选项
+            qualityLevels.forEach((level, index) => {
+                const height = level.height;
+                const bitrate = level.bitrate;
+                
+                let label = '未知';
+                if (height >= 1080) label = '1080P';
+                else if (height >= 720) label = '720P';
+                else if (height >= 480) label = '480P';
+                else if (height >= 360) label = '360P';
+                else if (height >= 240) label = '240P';
+                
+                // 如果显示码率信息
+                if (PLAYER_CONFIG.qualityControl.showBitrate && bitrate) {
+                    const bitrateKbps = Math.round(bitrate / 1000);
+                    label += ` (${bitrateKbps}kbps)`;
+                }
+                
+                availableQualities.push({
+                    value: height.toString(),
+                    label: label,
+                    level: index,
+                    height: height,
+                    bitrate: bitrate
+                });
+            });
+            
+            // 更新画质选择器选项
+            updateQualityOptions();
+        }
+        
+        // 更新画质选择器选项
+        function updateQualityOptions() {
+            const selector = document.getElementById('qualitySelector');
+            if (!selector) return;
+            
+            // 清空现有选项
+            selector.innerHTML = '';
+            
+            // 添加可用选项
+            availableQualities.forEach(quality => {
+                const option = document.createElement('option');
+                option.value = quality.value;
+                option.textContent = quality.label;
+                selector.appendChild(option);
+            });
+            
+            // 设置当前选中的画质
+            selector.value = currentQuality;
+        }
+        
+        // 设置初始画质
+        function setInitialQuality(hls) {
+            if (!hls || currentQuality === 'auto') {
+                // 自动画质，让HLS自动选择
+                hls.currentLevel = -1;
+                return;
+            }
+            
+            // 查找匹配的画质级别
+            const targetHeight = parseInt(currentQuality);
+            if (isNaN(targetHeight)) return;
+            
+            const matchingLevel = qualityLevels.findIndex(level => {
+                // 允许一定的误差范围
+                return Math.abs(level.height - targetHeight) <= 50;
+            });
+            
+            if (matchingLevel !== -1) {
+                console.log(`设置初始画质为: ${currentQuality}P (级别 ${matchingLevel})`);
+                hls.currentLevel = matchingLevel;
+            }
+        }
+        
+                 // 切换视频画质
+        function changeVideoQuality(quality) {
+            if (!currentHls) {
+                console.warn('HLS实例不可用，无法切换画质');
+                return;
+            }
+            
+            const oldQuality = currentQuality;
+            currentQuality = quality;
+            
+            // 保存用户选择
+            localStorage.setItem(PLAYER_CONFIG.qualityControl.storageKey, quality);
+            
+            // 更新选择器显示
+            document.getElementById('qualitySelector').value = quality;
+            
+            if (quality === 'auto') {
+                // 自动画质
+                currentHls.currentLevel = -1;
+                console.log('切换到自动画质');
+                showShortcutHint('自动画质');
+            } else {
+                // 手动选择画质
+                const targetHeight = parseInt(quality);
+                if (isNaN(targetHeight)) return;
+                
+                const matchingLevel = qualityLevels.findIndex(level => {
+                    return Math.abs(level.height - targetHeight) <= 50;
+                });
+                
+                if (matchingLevel !== -1) {
+                    currentHls.currentLevel = matchingLevel;
+                    console.log(`切换画质到: ${quality}P (级别 ${matchingLevel})`);
+                    showShortcutHint(`${quality}P画质`);
+                } else {
+                    // 如果找不到匹配的画质，回退到原来的选择
+                    currentQuality = oldQuality;
+                    document.getElementById('qualitySelector').value = oldQuality;
+                    showShortcutHint('画质不可用', 'warning');
+                }
+            }
+        }
+        
+        // 循环切换画质（用于快捷键）
+        function cycleVideoQuality() {
+            if (!availableQualities || availableQualities.length === 0) {
+                showShortcutHint('画质选项不可用', 'warning');
+                return;
+            }
+            
+            // 找到当前画质在列表中的索引
+            let currentIndex = availableQualities.findIndex(q => q.value === currentQuality);
+            if (currentIndex === -1) currentIndex = 0;
+            
+            // 切换到下一个画质
+            const nextIndex = (currentIndex + 1) % availableQualities.length;
+            const nextQuality = availableQualities[nextIndex];
+            
+            changeVideoQuality(nextQuality.value);
+        }
+        
+        // 更新画质选择器显示（当HLS自动切换时）
+        function updateQualitySelector(levelIndex) {
+            if (currentQuality !== 'auto') return; // 只在自动模式下更新显示
+            
+            const selector = document.getElementById('qualitySelector');
+            if (!selector || !qualityLevels[levelIndex]) return;
+            
+            const currentLevel = qualityLevels[levelIndex];
+            const height = currentLevel.height;
+            
+            // 在自动模式下，暂时更新显示但不改变用户选择
+            console.log(`HLS自动切换到: ${height}P`);
+        }
+        
+        // 快捷键提示函数增强版
+        function showShortcutHint(text, icon = 'settings', type = 'info') {
+            const hint = document.getElementById('shortcutHint');
+            const textEl = document.getElementById('shortcutText');
+            const iconEl = document.getElementById('shortcutIcon');
+            
+            if (!hint || !textEl || !iconEl) return;
+            
+            // 设置文本
+            textEl.textContent = text;
+            
+            // 设置图标
+            let iconPath = '';
+            switch (icon) {
+                case 'settings':
+                    iconPath = 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z';
+                    break;
+                case 'warning':
+                    iconPath = 'M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z';
+                    break;
+                default:
+                    iconPath = 'M15 19l-7-7 7-7';
+            }
+            
+            iconEl.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"></path>`;
+            
+            // 设置样式
+            hint.style.backgroundColor = type === 'warning' ? 'rgba(239, 68, 68, 0.9)' : 'rgba(0, 0, 0, 0.8)';
+            
+            // 显示提示
+            hint.classList.add('show');
+            
+            // 清除之前的定时器
+            if (shortcutHintTimeout) {
+                clearTimeout(shortcutHintTimeout);
+            }
+            
+            // 2秒后隐藏
+            shortcutHintTimeout = setTimeout(() => {
+                hint.classList.remove('show');
+            }, 2000);
         }
 
         let controlsLocked = false;
