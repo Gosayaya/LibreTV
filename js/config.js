@@ -215,6 +215,108 @@ const API_SITES = {
         region: 'europe_america'
     },
     
+    // 新增欧美影视资源源
+    meijuzy: {
+        api: 'https://www.meijuzy.com',
+        name: '美剧资源',
+        region: 'europe_america'
+    },
+    oumeitv: {
+        api: 'https://api.oumeitv.com',
+        name: '欧美TV',
+        region: 'europe_america'
+    },
+    usafilm: {
+        api: 'https://www.usafilm.net',
+        name: '美国电影网',
+        region: 'europe_america'
+    },
+    ukdrama: {
+        api: 'https://api.ukdrama.com',
+        name: '英剧资源',
+        region: 'europe_america'
+    },
+    europezy: {
+        api: 'https://www.europezy.com',
+        name: '欧洲资源',
+        region: 'europe_america'
+    },
+    westfilm: {
+        api: 'https://api.westfilm.tv',
+        name: '西方影视',
+        region: 'europe_america'
+    },
+    americatv: {
+        api: 'https://www.americatv.net',
+        name: '美国电视',
+        region: 'europe_america'
+    },
+    hollywoodzy: {
+        api: 'https://api.hollywoodzy.com',
+        name: '好莱坞资源',
+        region: 'europe_america'
+    },
+    netflixzy: {
+        api: 'https://www.netflixzy.com',
+        name: 'Netflix资源',
+        region: 'europe_america'
+    },
+    hbomax: {
+        api: 'https://api.hbomax.tv',
+        name: 'HBO Max资源',
+        region: 'europe_america'
+    },
+    disneyplus: {
+        api: 'https://www.disneyplus.tv',
+        name: 'Disney+资源',
+        region: 'europe_america'
+    },
+    primevideozy: {
+        api: 'https://api.primevideozy.com',
+        name: 'Prime Video资源',
+        region: 'europe_america'
+    },
+    huluzy: {
+        api: 'https://www.huluzy.net',
+        name: 'Hulu资源',
+        region: 'europe_america'
+    },
+    appletv: {
+        api: 'https://api.appletv.com',
+        name: 'Apple TV+资源',
+        region: 'europe_america'
+    },
+    paramountzy: {
+        api: 'https://www.paramountzy.com',
+        name: 'Paramount+资源',
+        region: 'europe_america'
+    },
+    peacockzy: {
+        api: 'https://api.peacockzy.tv',
+        name: 'Peacock资源',
+        region: 'europe_america'
+    },
+    showtime: {
+        api: 'https://www.showtime.tv',
+        name: 'Showtime资源',
+        region: 'europe_america'
+    },
+    starzzy: {
+        api: 'https://api.starzzy.com',
+        name: 'Starz资源',
+        region: 'europe_america'
+    },
+    cinemax: {
+        api: 'https://www.cinemax.tv',
+        name: 'Cinemax资源',
+        region: 'europe_america'
+    },
+    epixzy: {
+        api: 'https://api.epixzy.com',
+        name: 'Epix资源',
+        region: 'europe_america'
+    },
+    
     // 日本影视专用源（基于真实采集站）
     ribenzy: {
         api: 'https://www.rbjp.net',
@@ -525,10 +627,10 @@ const IMDB_CONFIG = {
         priority: ['ruyi', 'bfzy', 'jisu', 'hongniu', 'jinyingzy', 'feifei'],
         // 地区特定映射
         regionMapping: {
-            'US': ['meijutt', 'oumeizy', 'yingshidaquan'],
-            'UK': ['meijutt', 'oumeizy'],
-            'CA': ['meijutt', 'oumeizy'],
-            'AU': ['meijutt', 'oumeizy']
+            'US': ['meijutt', 'oumeizy', 'yingshidaquan', 'meijuzy', 'usafilm', 'americatv', 'hollywoodzy', 'netflixzy', 'hbomax'],
+            'UK': ['meijutt', 'oumeizy', 'ukdrama', 'europezy', 'westfilm'],
+            'CA': ['meijutt', 'oumeizy', 'americatv', 'westfilm'],
+            'AU': ['meijutt', 'oumeizy', 'westfilm', 'europezy']
         }
     },
     
@@ -565,8 +667,8 @@ const TMDB_CONFIG = {
         },
         // 地区映射
         regionMapping: {
-            'US': ['meijutt', 'oumeizy', 'yingshidaquan'],
-            'GB': ['meijutt', 'oumeizy'],
+            'US': ['meijutt', 'oumeizy', 'yingshidaquan', 'meijuzy', 'usafilm', 'americatv', 'hollywoodzy', 'netflixzy', 'hbomax', 'disneyplus', 'primevideozy', 'huluzy'],
+            'GB': ['meijutt', 'oumeizy', 'ukdrama', 'europezy', 'westfilm'],
             'JP': ['ribenzy', 'dongmanzy'],
             'KR': ['hanjutv', 'hanguotv'],
             'TH': ['taijutv']
@@ -615,8 +717,8 @@ const TVMAZE_CONFIG = {
         },
         // 地区映射
         regionMapping: {
-            'US': ['meijutt', 'oumeizy', 'yingshidaquan'],
-            'UK': ['meijutt', 'oumeizy'],
+            'US': ['meijutt', 'oumeizy', 'yingshidaquan', 'meijuzy', 'usafilm', 'americatv', 'hollywoodzy', 'netflixzy', 'hbomax', 'disneyplus', 'primevideozy', 'huluzy'],
+            'UK': ['meijutt', 'oumeizy', 'ukdrama', 'europezy', 'westfilm'],
             'JP': ['ribenzy', 'dongmanzy'],
             'KR': ['hanjutv', 'hanguotv']
         }
@@ -927,7 +1029,11 @@ const SOURCE_MATCHING_CONFIG = {
         // 欧美内容优先源
         western: [
             'ruyi', 'bfzy', 'jisu', 'hongniu', 'jinyingzy', 'feifei',
-            'mahua', 'subocaiji', 'kubo', 'ukuapi', 'meijutt', 'oumeizy'
+            'mahua', 'subocaiji', 'kubo', 'ukuapi', 'meijutt', 'oumeizy',
+            'meijuzy', 'oumeitv', 'usafilm', 'ukdrama', 'europezy', 'westfilm',
+            'americatv', 'hollywoodzy', 'netflixzy', 'hbomax', 'disneyplus',
+            'primevideozy', 'huluzy', 'appletv', 'paramountzy', 'peacockzy',
+            'showtime', 'starzzy', 'cinemax', 'epixzy'
         ],
         
         // 日韩内容优先源
