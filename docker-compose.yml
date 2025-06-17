@@ -4,14 +4,14 @@ services:
   libretv:
     build: .
     ports:
-      - "80:80"
+      - "8899:80"
       - "443:443"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./ssl:/etc/nginx/ssl
     environment:
       - NGINX_HOST=tv.lannuodo.com
-      - NGINX_PORT=80
+      - NGINX_PORT=8899
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/"]
