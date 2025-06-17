@@ -1,9 +1,21 @@
+version: '3.8'
+
 services:
   libretv:
-    image: bestzwei/libretv:latest
-    container_name: libretv
+    build: .
     ports:
-      - "8899:80"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
     environment:
-      - PASSWORD=666666
+      - NGINX_HOST=tv.lannuodo.com
+      - NGINX_PORT=80
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
